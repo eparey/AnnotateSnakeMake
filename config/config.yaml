@@ -1,0 +1,6 @@
+
+jobname: "amphiura"
+
+rna_sample_sheet: "samples.tsv"
+
+genome: "/home/shared/Amphiura/Afil_fr2py.fa"
