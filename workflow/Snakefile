@@ -1,0 +1,8 @@
+include: "rules/repeats.smk"
+
+from pathlib import Path
+
+GENOME = Path(config["genome"]).stem
+
+rule all:
+    input: config["genome"]+'.masked'

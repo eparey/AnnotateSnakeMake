@@ -1,6 +1,3 @@
 
-jobname: "amphiura"
-
-rna_sample_sheet: "samples.tsv"
-
-genome: "/home/shared/Amphiura/Afil_fr2py.fa"
+genome: "resources/amphiura_scaf1_subset.fa"
+# rna_sample_sheet: "samples.tsv"

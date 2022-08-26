@@ -3,13 +3,13 @@ rule star_index:
     """
     Build a genome index for STAR
     """
-    input: config["genome"]
+    input: config["genome"]+".masked"
     output: directory("resource/"+jobname+"/star_index")
     log: "logs/"+jobname+"/star_index_genome.log"
     conda: "../envs/star.yaml"
     threads: 6
     shell: "STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {output} "
-           "--genomeFastaFiles {input} --sjdbOverhang 100 2> {log}"
+           "--genomeFastaFiles {input} 2> {log}"
 
 
 def get_fq(sample_sheet):
@@ -29,7 +29,8 @@ rule star_align:
     conda: "../envs/star.yaml"
     threads: 24
     shell: "STAR --genomeDir {input.index} --runThreadN {threads} --readFilesIn {input.fq} "
-           "--outFileNamePrefix {params.pref} --outSAMtype BAM SortedByCoordinate 2> {log}"
+           "--readFilesCommand zcat --outFileNamePrefix {params.pref} "
+           "--outSAMtype BAM SortedByCoordinate --twopassMode Basic 2> {log}"
 
 
 rule stringtie_assemble:
@@ -74,7 +75,7 @@ rule transcripts_to_fasta:
     """
     Prepare a fasta file of transcripts for TransDecoder
     """
-    input: t = "results/"+jobname+"/taco/transcripts.gtf", g = config["genome"]
+    input: t = "results/"+jobname+"/taco/transcripts.gtf", g = config["genome"]+".masked"
     output: "results/"+jobname+"/trans_decoder/transcripts.fa"
     log: "logs/"+jobname+"/transdecoder/to_fasta.log"
     conda: "../envs/trans_decoder.yaml"
