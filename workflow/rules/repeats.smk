@@ -18,18 +18,14 @@ rule repeat_mod:
     Run RepeatModeler
     """
     input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
-    output: f'{GENOME}-families.fa', f'{GENOME}-families.stk'
+    output: tmp1 = temp(f'{GENOME}-families.fa'), tmp2 = temp(f'{GENOME}-families.stk'),
+            final1 = f"resources/{GENOME}-families.fa", final2 = f"resources/{GENOME}-families.stk"
     log: "logs/repeats/repeat_modeler.log"
     params: name = lambda w, input: Path(input[0]).stem
     conda: "../envs/repeats.yaml"
     threads: 12 #will use three or four times this I think
-    shell: "RepeatModeler -engine ncbi -pa {threads} -database {params.name} 2>&1 | tee {log} && rm -rf RM_*"
-
-rule mv_consensus:
-    input: fa = f'{GENOME}-families.fa', stk = f'{GENOME}-families.stk'
-    output: fa = f"resources/{GENOME}-families.fa", stk = f"resources/{GENOME}-families.stk"
-    log: "logs/repeats/mv_consensus.log"
-    shell: "mv {input.fa} {output.fa} && mv {input.stk} {output.stk} 2>&1 | tee {log}"
+    shell: "RepeatModeler -engine ncbi -pa {threads} -database {params.name} 2>&1 | tee {log} && rm -rf RM_* && "
+           "cp {output.tmp1} {output.final1} && cp {output.tmp2} {output.final2}"
 
 rule repeat_masker:
     """
@@ -44,22 +40,17 @@ rule repeat_masker:
 
 rule prepare_landscape:
     input: config["genome"]+'.align'
-    output: config["genome"]+'_summary.divsum'
+    output: f'resources/{GENOME}_summary.divsum'
     conda: "../envs/repeats.yaml"
-    shell: "calcDivergenceFromAlign.pl -s {output} {input}"
-
-def get_genome_size(input_file):
-    with open(input_file, 'r') as infile:
-        for line in infile:
-            if "total length:" in line:
-                size = int(line.split()[2])
-                return size
+    log: "logs/repeats/prepare_landscape.log"
+    shell: "calcDivergenceFromAlign.pl -s {output} {input} 2>&1 | tee"
 
 rule repeat_landscape:
-    input: div = config["genome"]+'_summary.divsum', tbl = config["genome"]+'.tbl'
-    output: config["genome"]+'_repeat_landscape.html'
+    input: div = f'resources/{GENOME}_summary.divsum', tbl = config["genome"]+'.tbl'
+    output: f'resources/{GENOME}_repeat_landscape.html'
+    log: "logs/repeats/repeat_landscape.log"
     params: gsize = lambda w, input: get_genome_size(input.tbl)
     conda: "../envs/repeats.yaml" 
-    shell: "createRepeatLandscape.pl -div {input.div} -g {params.gsize} > {output}"
+    shell: "createRepeatLandscape.pl -div {input.div} -g {params.gsize} > {output} 2> | tee {log}"
 
-#TODO: add plot to report
+#TODO: add plots to snakemake report

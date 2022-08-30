@@ -1,3 +1,5 @@
+
+include: "rules/common.smk"
 include: "rules/repeats.smk"
 
 from pathlib import Path
@@ -5,4 +7,4 @@ from pathlib import Path
 GENOME = Path(config["genome"]).stem
 
 rule all:
-    input: config["genome"]+'.masked', config["genome"]+'_repeat_landscape.html'
+    input: config["genome"]+'.masked', f'resources/{GENOME}_repeat_landscape.html'
