@@ -14,13 +14,13 @@ rule star_index:
 
 # def get_fq(sample_sheet):
 #     return
-SAMPLE = ["1d-M-1_P6959_2024"]
+SAMPLE = ["1d-M-1_P6959_2024_subset"]
 
 rule star_align:
     """
     Align reads to the genome using STAR
     """
-    input: fq1 = "/home/shared/Amphiura/RNA-seq/fastqs/{sample}_R1_tr.fq.gz", fq2 = "/home/shared/Amphiura/RNA-seq/fastqs/{sample}_R2_tr.fq.gz", index = "resources/star_index"
+    input: fq1 = "resources/{sample}_R1_tr.fq.gz", fq2 = "resources/{sample}_R2_tr.fq.gz", index = "resources/star_index"
     output: "results/star/{sample}/Aligned.sortedByCoord.out.bam"
     log: "logs/star/{sample}.log"
     params: pref =  lambda wildcards, input: wildcards.sample
@@ -51,47 +51,46 @@ rule list_stringtie_assemblies:
     input: infiles = expand("results/stringtie/{sample}_assembly.gtf", sample=SAMPLE)
     output: outfile = "results/stringtie/assemblies_gtf.txt"
     run:
-        with open(output.out, 'w') as out:
-            for filename in infiles:
+        with open(output.outfile, 'w') as out:
+            for filename in input.infiles:
                 out.write(filename+'\n')
-
 
 rule taco_merge:
     """
     Make a consensus transcriptome from the different transcriptome assemblies with taco
     """
     input: "results/stringtie/assemblies_gtf.txt"
-    output: "results/taco/transcripts.gtf"
+    output: "results/taco/assembly.gtf"
     log: "logs/taco/taco.log"
     params: odir = "results/taco/"
     conda: "../envs/taco.yaml"
     threads: 8
-    shell: "taco_run -p {threads} -o {params.odir} {input} 2>&1 | tee {log}"
+    shell: "rm -r {params.odir} && taco_run -p {threads} -o {params.odir} {input} 2>&1 | tee {log}"
 
 
 rule transcripts_to_fasta:
     """
     Prepare a fasta file of transcripts for TransDecoder
     """
-    input: t = "results/taco/transcripts.gtf", g = config["genome"]+".masked"
+    input: t = "results/taco/assembly.gtf", g = config["genome"]+".masked"
     output: "results/trans_decoder/transcripts.fa"
     log: "logs/transdecoder/to_fasta.log"
     conda: "../envs/trans_decoder.yaml"
-    shell: "util/gtf_genome_to_cdna_fasta.pl {input.t} {input.g} > {output} 2>&1 | tee {log}"
+    shell: "gtf_genome_to_cdna_fasta.pl {input.t} {input.g} > {output} 2>&1 | tee {log}"
 
 
 rule transcripts_to_gff3:
     """
     Prepare a gff3 file of transcripts for TransDecoder
     """
-    input: "results/taco/transcripts.gtf"
+    input: "results/taco/assembly.gtf"
     output: "results/trans_decoder/transcripts.gff3"
     log: "logs/transdecoder/to_gff3.log"
     conda: "../envs/trans_decoder.yaml"
-    shell: "util/gtf_to_alignment_gff3.pl {input} > {output} 2>&1 | tee {log}"
+    shell: "gtf_to_alignment_gff3.pl {input} > {output} 2>&1 | tee {log}"
 
 
-rule trans_decoder:
+rule transdecoder_predict:
     """
     Find coding regions within transcripts with TransDecoder
     """
@@ -99,11 +98,21 @@ rule trans_decoder:
         fa = "results/trans_decoder/transcripts.fa",
         gff = "results/trans_decoder/transcripts.gff3"
     output:
-        gff = "results/trans_decoder/transcripts.fa.transdecoder.genome.gff3",
-        bed = "results/trans_decoder/transcripts.fa.transdecoder.genome.bed"
-    log: "logs/transdecoder/transdecoder.log"
+        tmp_gff = "transcripts.fa.transdecoder.gff3"
+    log: log1 = "logs/transdecoder/transdecoder_longorfs.log", log2 = "logs/transdecoder/transdecoder_predict.log"
     conda: "../envs/trans_decoder.yaml"
+    params: config.get("transdecoder_predict_args", "")
     shell:
-        "TransDecoder.LongOrfs -t {input.fa} && "
-        "util/cdna_alignment_orf_to_genome_orf.pl {input.fa}.transdecoder.gff3 {input.gff} {input.fa} > {output.gff} && "
-        "utilgff3_file_to_bed.pl {output.gff} > {output.bed}"
+        "TransDecoder.LongOrfs -t {input.fa} 2>&1 | tee {log.log1} && "
+        "TransDecoder.Predict {params} -t {input.fa} 2>&1 | tee {log.log2}"
+
+
+rule transdecoder_to_genome:
+    input: fa = "results/trans_decoder/transcripts.fa", gff =  "results/trans_decoder/transcripts.gff3", gff_v2 = "transcripts.fa.transdecoder.gff3"
+    output: gff = "results/trans_decoder/transcripts.fa.transdecoder.genome.gff3",
+            bed = "results/trans_decoder/transcripts.fa.transdecoder.genome.bed"
+    conda: "../envs/trans_decoder.yaml"
+    log: log1 = "logs/transdecoder/transdecoder.log", log2 = "logs/transdecoder/to_bed.log"
+    shell:
+        "cdna_alignment_orf_to_genome_orf.pl {input.gff_v2} {input.gff} {input.fa} > {output.gff} 2>&1 | tee {log.log1} && "
+        "gff3_file_to_bed.pl {output.gff} > {output.bed} 2>&1 | tee {log.log2} && rm pipeliner* && rm -r transcripts.fa*"
