@@ -1,3 +1,5 @@
 
 genome: "resources/amphiura_scaf1_subset.fa"
 # rna_sample_sheet: "samples.tsv"
+
+transdecoder_predict_args: "--no_refine_starts"
