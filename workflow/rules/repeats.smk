@@ -9,7 +9,7 @@ rule make_db:
     input: config["genome"]
     output: temp(expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation']))
     log: "logs/repeats/make_db.log"
-    params: name = lambda w, input: Path(input).stem
+    params: name = lambda w, input: Path(input[0]).stem
     conda: "../envs/repeats.yaml"
     shell: "BuildDatabase -name {params.name} -engine ncbi {input} 2>&1 | tee {log}"
 
