@@ -1,0 +1,1 @@
+sed -i "s#/home/rhubley/projects/RepeatMasker#${CONDA_PREFIX}/share/RepeatMasker/#"  "${CONDA_PREFIX}/bin/calcDivergenceFromAlign.pl"

@@ -36,18 +36,30 @@ rule repeat_masker:
     Run RepeatMasker using the de novo RepeatModeler library
     """
     input: lib = f"resources/{GENOME}-families.fa", g = config["genome"]
-    output: config["genome"]+'.masked', config["genome"]+'.align'
+    output: config["genome"]+'.masked', config["genome"]+'.align', config["genome"]+'.tbl'
     log: "logs/repeats/repeat_masker.log"
     conda: "../envs/repeats.yaml"
     threads: 12 #will use three or four times this I think
     shell: "RepeatMasker -pa {threads} -xsmall -gff -lib {input.lib} {input.g} -a 2>&1 | tee {log}"
 
+rule prepare_landscape:
+    input: config["genome"]+'.align'
+    output: config["genome"]+'_summary.divsum'
+    conda: "../envs/repeats.yaml"
+    shell: "calcDivergenceFromAlign.pl -s {output} {input}"
 
-#will need a post-activate script to fix repeatmasker I think ?
-#To use `calcDivergenceFromAlign.pl` from RepeatMasker with a conda installation:
-#--> need to open the script and modify the hard-coded path to their perl modules... Replace 'use lib "/home/rhubley/projects/RepeatMasker";' line 88 by 'use lib "/import/kg_dyows01/workspace1/parey/miniconda3/envs/repeat_mod/share/RepeatMasker";' <-- should be $CONDA_PREFIX/share/RepeatMasker
+def get_genome_size(input_file):
+    with open(input_file, 'r') as infile:
+        for line in infile:
+            if "total length:" in line:
+                size = int(line.split()[2])
+                return size
 
+rule repeat_landscape:
+    input: div = config["genome"]+'_summary.divsum', tbl = config["genome"]+'.tbl'
+    output: config["genome"]+'_repeat_landscape.html'
+    params: gsize = lambda w, input: get_genome_size(input.tbl)
+    conda: "../envs/repeats.yaml" 
+    shell: "createRepeatLandscape.pl -div {input.div} -g {params.gsize} > {output}"
 
-#TODO: make repeatlandscape as part of the generated report??
-#rule prepare_landscape
-#rule repeat_landscape
+#TODO: add plot to report

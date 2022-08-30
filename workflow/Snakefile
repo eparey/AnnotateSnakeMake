@@ -5,4 +5,4 @@ from pathlib import Path
 GENOME = Path(config["genome"]).stem
 
 rule all:
-    input: config["genome"]+'.masked'
+    input: config["genome"]+'.masked', config["genome"]+'_repeat_landscape.html'
