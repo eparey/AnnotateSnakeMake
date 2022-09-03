@@ -1,0 +1,7 @@
+name: portcullis
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - portcullis

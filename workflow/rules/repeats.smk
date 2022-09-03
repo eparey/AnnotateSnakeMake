@@ -17,7 +17,7 @@ rule repeat_mod:
     """
     input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
     output: tmp1 = temp(f'{GENOME}-families.fa'), tmp2 = temp(f'{GENOME}-families.stk'),
-            final1 = f"resources/{GENOME}-families.fa", final2 = f"resources/{GENOME}-families.stk"
+            final1 = f"results/repeats/{GENOME}-families.fa", final2 = f"results/repeats/{GENOME}-families.stk"
     log: "logs/repeats/repeat_modeler.log"
     params: name = lambda w, input: Path(input[0]).stem
     conda: "../envs/repeats.yaml"
@@ -29,19 +29,27 @@ rule repeat_masker:
     """
     Run RepeatMasker using the de novo RepeatModeler library
     """
-    input: lib = f"resources/{GENOME}-families.fa", g = config["genome"]
-    output: config["genome"]+'.masked', config["genome"]+'.align', config["genome"]+'.tbl'
+    input: lib = f"results/repeats/{GENOME}-families.fa", g = config["genome"]
+    output: config["genome"]+'.masked', config["genome"]+'.align', config["genome"]+'.out', config["genome"]+'.tbl'
     log: "logs/repeats/repeat_masker.log"
     conda: "../envs/repeats.yaml"
     threads: 12 #will use three or four times this I think (add a warning or divide --cores)
     shell: "RepeatMasker -pa {threads} -xsmall -gff -lib {input.lib} {input.g} -a 2>&1 | tee {log}"
+
+
+rule repeat_masker_to_bed:
+    input: config["genome"]+'.out'
+    output: config["genome"]+'.bed'
+    shell:"""
+          awk -v OFS="\t" 'NR>3,$1=$1' {input} | cut -f 5,6,7,10 > {output}
+          """
 
 rule prepare_landscape:
     """
     Prepare inputs to create the repeat landscape
     """
     input: config["genome"]+'.align'
-    output: f'resources/{GENOME}_summary.divsum'
+    output: f'results/repeats/{GENOME}_summary.divsum'
     conda: "../envs/repeats.yaml"
     log: "logs/repeats/prepare_landscape.log"
     shell: "calcDivergenceFromAlign.pl -s {output} {input} 2>&1 | tee"
@@ -50,8 +58,8 @@ rule repeat_landscape:
     """
     Plot the repeat landscape
     """
-    input: div = f'resources/{GENOME}_summary.divsum', tbl = config["genome"]+'.tbl'
-    output: f'resources/{GENOME}_repeat_landscape.html'
+    input: div = f'results/repeats/{GENOME}_summary.divsum', tbl = config["genome"]+'.tbl'
+    output: f'results/repeats/{GENOME}_repeat_landscape.html'
     log: "logs/repeats/repeat_landscape.log"
     params: gsize = lambda w, input: get_genome_size(input.tbl)
     conda: "../envs/repeats.yaml" 

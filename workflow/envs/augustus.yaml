@@ -1,0 +1,7 @@
+name: augustus
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - augustus

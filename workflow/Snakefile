@@ -1,7 +1,10 @@
 
 include: "rules/common.smk"
 include: "rules/repeats.smk"
-include: "rules/ref_transcriptome.smk"
+include: "rules/transcriptome_using_genome.smk"
+include: "rules/transcriptome_de_novo.smk"
+#include: "rules/gene_pred.smk"
 
 rule all:
-    input: config["genome"]+'.masked', f'resources/{GENOME}_repeat_landscape.html', "results/trans_decoder/transcripts.fa.transdecoder.genome.bed"
+    input: f'results/repeats/{GENOME}_repeat_landscape.html', 'results/trinity_mapped/Trinity_transcripts.gff3', "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed"
+     

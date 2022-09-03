@@ -1,0 +1,7 @@
+name: metaeuk
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - metaeuk
