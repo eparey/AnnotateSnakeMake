@@ -22,18 +22,20 @@
 #                 prec = feature_type
 
 rule select_mikado_train:
-    input: "mikado.loci.metrics.tsv", "mikado.loci.gff3"
-    output: "training.gff3"
-    shell: "python scripts/select_mik_train.py -f 0.5 -e 2 {input}"
+    input: "results/mikado/mikado.loci.metrics.tsv", "results/mikado/mikado.loci.gff3"
+    output: "results/augustus_train/training.gff3"
+    conda: "../envs/python3.yaml"
+    shell: "python scripts/select_mik_train.py -f 0.5 -e 2 {input} -o {output}"
+
 
 rule train_augustus:
-    input: gff = "training.gff3",
+    input: gff = "results/augustus_train/training.gff3",
            g = config["genome"]+".masked"
-    output: directory("results/augustus")
+    output: "results/augustus_training/autoAugTrain/training/test/augustus.2.withoutCRF.out"
     conda: '../envs/augustus.yaml'
-    params: spname = GENOME
-    shell: "mkdir -p 'results/augustus' && autoAugTrain.pl --trainingset={input.gff} --genome={input.g} "
-           "--species={params.spname} --workingdir={output} --optrounds=1 --verbose --useexisting"
+    params: spname = GENOME, odir = "results/augustus_training"
+    shell: "mkdir -p {params.odir} && autoAugTrain.pl --trainingset={input.gff} --genome={input.g} "
+           "--species={params.spname} --workingdir={params.odir} --optrounds=1 --verbose --useexisting"
 
 
 rule portcullis_to_hint:
@@ -44,7 +46,10 @@ rule portcullis_to_hint:
 
 
 rule mikado_to_hint:
-    "python gtfToHintsMik.py mikado.loci.gtf"
+    input: "results/mikado/mikado.loci.gtf"
+    output: "results/hints_for_augustus/mikado_exons_hints.gff"   
+    conda: "../envs/python3.yaml"
+    shell: "python ../scripts/mikado_gtf_to_hints.py {input} -o {output}"
 
 
 # rule metaeuk_sim_prot_db:
@@ -63,17 +68,26 @@ rule metauk_genome_db:
 
 rule metaeuk:
     input: genome =  f"results/metaeuk/{GENOME}.DB", profile = config["metaeuk_profileDB"]
-    output: "results/metaeuk/pred_results"
+    output: "results/metaeuk/pred_results.gff"
     params: tmp = "results/metaeuk/tmp/"
     threads: 30
     shell: "metaeuk easy-predict {input.genome} {input.profile} {output} {params.tmp} --threads {threads}"
 
 rule metaeuk_to_hint:
+    input: "results/metaeuk/pred_results.gff"
+    output: "results/hints_for_augustus/protsim_hints.gff"
+    conda: "../envs/python3.yaml"
+    shell: "python ../scripts/metaeuk_to_hints.py {input} -o {output}"
 
 rule augustus:
-"augustus --uniqueGeneId=true --gff3=on \
-   --species=$sp \
-   --hintsfile=$hints \
-   --extrinsicCfgFile=extrinsic.E.W.P.cfg \
-   --allow_hinted_splicesites=atac \
-   --alternatives-from-evidence=false $FA > ${FA%.*}.aug.out"
+    input: h1 = "results/hints_for_augustus/intronhints.gff",
+           h2 = "results/hints_for_augustus/mikado_exons_hints.gff",
+           h3 = "results/hints_for_augustus/protsim_hints.gff",
+           c = config.get("augustus_config", "../../config/extrinsic.E.W.P.cfg"),
+           genome = config["genome"] + ".masked"
+    output: f"results/augustus/{GENOME}.aug.out"
+    params: sp = GENOME
+    conda: '../envs/augustus.yaml'
+    shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "#to do probably cat hint files
+           "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
+           "--alternatives-from-evidence=false {input.genome} > {output}"
