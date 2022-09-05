@@ -6,8 +6,8 @@ if sample_file:
     with open(sample_file, 'r') as infile:
         for line in infile:
             if line[0] != '#':
-                sample, fastqs = line.strip().split('\t')
-                SAMPLES[sample] = fastqs.split(',')
+                sample, rep, fastq1, fastq2 = line.strip().split('\t')
+                SAMPLES[sample] = [fastq1, fastq2]
 
 print(SAMPLES)
 
@@ -37,7 +37,7 @@ rule star_align:
     conda: "../envs/star.yaml"
     threads: 24
     shell: "STAR --genomeDir {input.index} --runThreadN {threads} --readFilesIn {input.fq1} {input.fq2} "
-           "--readFilesCommand zcat --outFileNamePrefix results/star/{params.pref}/ "
+           "--readFilesCommand zcat --outFileNamePrefix results/star/{params.pref}/ --outSAMstrandField intronMotif "
            "--outSAMtype BAM SortedByCoordinate --twopassMode Basic 2>&1 | tee {log}"
 
 
@@ -48,10 +48,9 @@ rule stringtie_assemble:
     input: "results/star/{sample}/Aligned.sortedByCoord.out.bam"
     output: "results/stringtie/{sample}_assembly.gtf"
     log: "logs/stringtie/{sample}.log"
-    params: "--rf"
     conda: "../envs/stringtie.yaml"
     threads: 4
-    shell: "stringtie -o {output} {params} -p {threads} {input} 2>&1 | tee {log}"
+    shell: "stringtie -o {output} -p {threads} {input} 2>&1 | tee {log}"
 
 
 rule list_stringtie_assemblies:
@@ -98,7 +97,7 @@ rule portcullis:
     params: odir = "results/portcullis/"
     conda: '../envs/portcullis.yaml'
     threads: 20
-    shell: "portcullis full -t {threads} -v --strandedness firststrand --bam_filter "
+    shell: "portcullis full -t {threads} -v --bam_filter "
            "-o {params.odir} {input.g} {input.b}"
 
 
