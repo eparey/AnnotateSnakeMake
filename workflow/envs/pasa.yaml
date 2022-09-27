@@ -1,7 +1,8 @@
-name: augustus
+name: pasa
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - gffread
+  - pasa

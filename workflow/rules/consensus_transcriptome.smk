@@ -1,42 +1,54 @@
+
+
 rule mikado_configure:
     input:
         junctions = "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed",
         fa = config["diamond"].replace(".dmnd", ".fa"),
         g = config["genome"]+'.masked',
-        assemblies = config["mikado"]
-    output: "results/mikado/configuration.yaml", "results/mikado/human_scoring.yaml"
+        assemblies = config["mikado"],
+        trinity = "results/trinity_mapped/Trinity_transcripts.gff3",
+        taco = "results/taco/assembly.gtf"
+    output: temp("results/mikado/configuration.yaml"), "results/mikado/human_scoring.yaml"
     params: odir = lambda w, output: os.path.dirname(output[0])
     conda: "../envs/mikado.yaml"
     shell:"mikado configure --list {input.assemblies} --reference {input.g}  --mode permissive "
           "--scoring human.yaml --copy-scoring {output[1]} --junctions {input.junctions} "
-          "-bt {input.fa} --out-dir {params.odir} {output[0]}"
+          "-bt {input.fa} -od {params.odir} {output[0]}"
+
+rule fix_config:
+    input: "results/mikado/configuration.yaml"
+    output: "results/mikado/configuration.ok.yaml"
+    shell: "sed 's#mikado_prepared.fasta#results/mikado/mikado_prepared.fasta#g' {input} | "
+           "sed 's#mikado_prepared.gtf#results/mikado/mikado_prepared.gtf#g' > {output} | "
+           "sed 's#/mikado.db#results/mikado/mikado.db#g' > {output}"
 
 
 rule mikado_prepare:
-    input: "results/mikado/configuration.yaml"
+    input: "results/mikado/configuration.ok.yaml"
     output: "results/mikado/mikado_prepared.fasta",  "results/mikado/mikado_prepared.gtf"
+    params: odir = lambda w, output: os.path.dirname(output[0])
     conda: "../envs/mikado.yaml"
-    shell: "mikado prepare --json-conf {input}"
+    shell: "mikado prepare --json-conf {input} --out {output[1]} --out_fasta {output[0]}"
 
 
 rule mikado_diamond:
-    input: q = "mikado_prepared.fasta", db = config["diamond"]
+    input: q = "results/mikado/mikado_prepared.fasta", db = config["diamond"]
     output: "results/mikado/mikado_diamond.xml"
-    threads: 20
+    threads: 30
     conda: "../envs/mikado.yaml"
     shell: "diamond blastx --query {input.q} --max-target-seqs 5 --sensitive --index-chunks 1 "
            "--threads {threads} --db {input.db} --evalue 1e-6 --outfmt 5 --out {output}"
 
 
-rule transcripts_to_gff3:
-    """
-    Prepare a gff3 file of transcripts for TransDecoder
-    """
-    input: "results/mikado/mikado_prepared.gtf"
-    output: "results/mikado/mikado_prepared.gff3"
-    log: "logs/transdecoder/to_gff3.log"
-    conda: "../envs/transdecoder.yaml"
-    shell: "gtf_to_alignment_gff3.pl {input} > {output} 2>&1 | tee {log}"
+# rule transcripts_to_gff3:
+#     """
+#     Prepare a gff3 file of transcripts for TransDecoder
+#     """
+#     input: "results/mikado/mikado_prepared.gtf"
+#     output: "results/mikado/mikado_prepared.gff3"
+#     log: "logs/transdecoder/to_gff3.log"
+#     conda: "../envs/transdecoder.yaml"
+#     shell: "gtf_to_alignment_gff3.pl {input} > {output} 2>&1 | tee {log}"
 
 
 rule transdecoder_predict:
@@ -44,46 +56,56 @@ rule transdecoder_predict:
     Find coding regions within transcripts with TransDecoder
     """
     input:
-        fa = "results/mikado/mikado_prepared.fasta",
-        gff = "results/mikado/mikado_prepared.gff3"
+        fa = "results/mikado/mikado_prepared.fasta"
     output:
-        tmp_gff = "transcripts.fa.transdecoder.gff3"
+        bed = "results/mikado/mikado_prepared.fasta.transdecoder.bed"
     log: log1 = "logs/transdecoder/transdecoder_longorfs.log", log2 = "logs/transdecoder/transdecoder_predict.log"
     conda: "../envs/transdecoder.yaml"
     params: config.get("transdecoder_predict_args", "")
     shell:
         "TransDecoder.LongOrfs -t {input.fa} 2>&1 | tee {log.log1} && "
-        "TransDecoder.Predict {params} -t {input.fa} 2>&1 | tee {log.log2}"
+        "TransDecoder.Predict {params} -t {input.fa} 2>&1 | tee {log.log2} && "
+        "mv mikado_prepared.fasta.transdecoder.bed {output} && "
+        "rm pipeliner* && rm -r mikado_prepared.fasta.transdecoder*"
 
 
-rule transdecoder_to_genome:
-    input: fa = "results/mikado/mikado_prepared.fasta", gff =  "results/mikado/mikado_prepared.gff3", gff_v2 = "transcripts.fa.transdecoder.gff3"
-    output: gff = "results/mikado/mikado_transdecoder.gff3",
-            bed = "results/mikado/mikado_transdecoder.bed"
-    conda: "../envs/transdecoder.yaml"
-    log: log1 = "logs/transdecoder/transdecoder.log", log2 = "logs/transdecoder/to_bed.log"
-    shell:
-        "cdna_alignment_orf_to_genome_orf.pl {input.gff_v2} {input.gff} {input.fa} > {output.gff} 2>&1 | tee {log.log1} && "
-        "gff3_file_to_bed.pl {output.gff} > {output.bed} 2>&1 | tee {log.log2} && rm pipeliner* && rm -r transcripts.fa*"
+# rule transdecoder_to_genome:
+#     input: fa = "results/mikado/mikado_prepared.fasta", gff =  "results/mikado/mikado_prepared.gff3", gff_v2 = "mikado_prepared.fasta.transdecoder.gff3"
+#     output: gff = "results/mikado/mikado_transdecoder.gff3",
+#             bed = "results/mikado/mikado_transdecoder.bed"
+#     conda: "../envs/transdecoder.yaml"
+#     log: log1 = "logs/transdecoder/transdecoder.log", log2 = "logs/transdecoder/to_bed.log"
+#     shell:
+#         "cdna_alignment_orf_to_genome_orf.pl {input.gff_v2} {input.gff} {input.fa} > {output.gff} && "
+#         "gff3_file_to_bed.pl {output.gff}  | tail -n +3 > {output.bed} 2>&1 | tee {log.log2} && rm pipeliner* && rm -r mikado_prepared.fasta.transdecoder*"
 
 
 rule mikado_serialize:
-    input: conf = "results/mikado/configuration.yaml", blast = "results/mikado/mikado_diamond.xml",
-           fa = config["diamond"].replace(".dmnd", ".fa"), bed = "results/mikado/mikado_transdecoder.bed"
-    output: "results/mikado/mikado.subloci.gff3"
+    input: conf = "results/mikado/configuration.ok.yaml", blast = "results/mikado/mikado_diamond.xml",
+           fa = config["diamond"].replace(".dmnd", ".fa"), bed =  "results/mikado/mikado_prepared.fasta.transdecoder.bed" #"results/mikado/mikado_transdecoder.bed"
+    output: "results/mikado/mikado.db"
+    params: odir = lambda w, output: os.path.dirname(output[0])
     conda: "../envs/mikado.yaml"
     shell: "mikado serialise --json-conf {input.conf} --xml {input.blast} --orfs {input.bed} "
-           "--blast_targets {input.fa}"
+           "--blast_targets {input.fa} -od {params.odir}"
+
+# rule mikado_fix:
+#     input:  "results/mikado/mikado.db"
+#     output: temp("mikado.db")
+#     conda: "../envs/mikado.yaml"
+#     shell: "cp {input} {output}"
 
 rule mikado_pick:
-    input: "results/mikado/mikado.subloci.gff3"
-    output: "results/mikado/mikado.loci.metrics.tsv", "results/mikado/mikado.loci.gff3"
+    input:  c = "results/mikado/configuration.ok.yaml", db="results/mikado/mikado.db" #"mikado.db"
+    output: "results/mikado/mikado.loci.metrics.tsv", "results/mikado/mikado.loci.gff3", "results/mikado/mikado.subloci.gff3"
     conda: "../envs/mikado.yaml"
-    shell: "mikado pick --json-conf configuration.yaml --subloci_out {input}"
+    params: odir = lambda w, output: os.path.dirname(output[0]), subloc = "mikado.subloci.gff3"
+    threads: 24
+    shell: "mikado pick --json-conf {input.c} --start-method=spawn --subloci_out {params.subloc} -od {params.odir} -db {input.db} --procs={threads}"
 
 
 rule mikado_to_gtf:
     input: "results/mikado/mikado.loci.gff3"
     output: "results/mikado/mikado.loci.gtf"
     conda: "../envs/agat.yaml"
-    shell: "agat_convert_sp_gxf2gxf.pl --gff {input}"
+    shell: "agat_convert_sp_gxf2gxf.pl --gff {input} -o {output}"

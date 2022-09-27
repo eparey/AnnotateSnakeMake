@@ -1,7 +1,8 @@
-name: augustus
+name: pybedtools
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - pybedtools
+  - python=3.9

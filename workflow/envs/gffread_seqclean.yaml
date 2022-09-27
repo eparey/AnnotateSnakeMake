@@ -1,7 +1,8 @@
-name: augustus
+name: gffread_seqclean
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - gffread
+  - seqclean

@@ -1,6 +1,15 @@
+# Required
 
 genome: "resources/amphiura_scaf1_subset.fa"
-rna_samples: "config/samples.tsv"
 
+rna_samples: "/home/elise/projects/annot/AnnotateSnakeMake/config/samples.tsv"
+
+diamond: "/home/elise/projects/annot/AnnotateSnakeMake/resources/swissprot.metazoa.dmnd"
+
+prot_fasta: "/home/elise/projects/annot/AnnotateSnakeMake/resources/metaeuk/prot.fa"
+
+
+mikado: "/home/elise/projects/annot/AnnotateSnakeMake/config/mikado.conf" #TO DO, create in snakemake
+
+# Optional
 transdecoder_predict_args: "--no_refine_starts"
-diamond: "home/elise/projects/annot/AnnotateSnakeMake/resources/swissprot.metazoa.dmnd"

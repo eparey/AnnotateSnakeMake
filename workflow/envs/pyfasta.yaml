@@ -1,7 +1,8 @@
-name: augustus
+name: pyfasta
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - pyfasta
+  - python=3.9

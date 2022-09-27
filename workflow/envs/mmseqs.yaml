@@ -1,7 +1,7 @@
-name: augustus
+name: metaeuk
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - mmseqs2

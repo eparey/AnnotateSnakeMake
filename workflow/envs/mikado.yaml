@@ -1,7 +1,8 @@
-name: augustus
+name: mikado
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - augustus=3.3.3
+  - mikado
+  - networkx<2

@@ -39,7 +39,7 @@ rule repeat_masker:
 
 rule repeat_masker_to_bed:
     input: config["genome"]+'.out'
-    output: config["genome"]+'.bed'
+    output: f'results/repeats/{GENOME}_repeats.bed'
     shell:"""
           awk -v OFS="\t" 'NR>3,$1=$1' {input} | cut -f 5,6,7,10 > {output}
           """
@@ -53,6 +53,7 @@ rule prepare_landscape:
     conda: "../envs/repeats.yaml"
     log: "logs/repeats/prepare_landscape.log"
     shell: "calcDivergenceFromAlign.pl -s {output} {input} 2>&1 | tee"
+
 
 rule repeat_landscape:
     """
