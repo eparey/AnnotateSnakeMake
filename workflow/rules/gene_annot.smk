@@ -27,7 +27,7 @@ rule pasa_load:
 
 
 rule pasa_run_1:
-    input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t = "results/mikado/mikado.subloci.gff3", l = "results/pasa/.loaded_augustus"
+    input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t =  "results/mikado/mikado.subloci.fasta.clean", l = "results/pasa/.loaded_augustus"
     output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.3747042.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
