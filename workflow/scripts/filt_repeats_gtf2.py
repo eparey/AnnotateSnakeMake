@@ -13,8 +13,8 @@ input_bed = snakemake.input[1] #"../GenomeAnnotationAmphiura/resources/genome/Af
 output = snakemake.output[0] #'test.gff' #
 
 
-cutoff_f=0.1
-cutoff_F=0.5
+cutoff_f = 0.1
+filt_ex_prop = float(snakemake.params[0])
 
 genes = BedTool(input_gtf)
 genes = genes.remove_invalid().saveas()
@@ -42,7 +42,7 @@ for gene in nbExGene:
     nfilt=nbFiltEx.get(gene, 0)
     nexon=nbExGene[gene]
     histex['{0}:{1}'.format(nfilt, nexon)]+=1
-    if nfilt/float(nexon)>0.9:
+    if nfilt/float(nexon) > filt_ex_prop:
         kept.append(gene)
 
 print('initial number of genes:', len(nbExGene))

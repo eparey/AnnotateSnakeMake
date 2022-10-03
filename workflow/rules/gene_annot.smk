@@ -28,29 +28,23 @@ rule pasa_load:
 
 rule pasa_run_1:
     input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t =  "results/mikado/mikado.subloci.fasta.clean", l = "results/pasa/.loaded_augustus"
-    output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.3747042.gff3"
+    output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/Launch_PASA_pipeline.pl -c {input.c} -A -g {input.g} -t {input.t} --CPU {threads}"
 
 
 rule pasa_update_db:
-    input: p = "GenomeMik.sqlite.gene_structures_post_PASA_updates.3747042.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt")
+    input: p = "GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt")
     output: touch("results/pasa/.updated_db_after_run1")
     conda: "../envs/pasa.yaml"
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/scripts/Load_Current_Gene_Annotations.dbi -c {input.c} -g {input.g} -P {input.p}"
 
 rule pasa_run_2:
     input: up = "results/pasa/.updated_db_after_run1", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t =  "results/mikado/mikado.subloci.fasta.clean",
-    output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.4130607.gff3"
+    output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.2760253.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/Launch_PASA_pipeline.pl -c {input.c} -A -g {input.g} -t {input.t} --CPU {threads}"
 
-
-rule filter_repeats:
-    input: "GenomeMik.sqlite.gene_structures_post_PASA_updates.4130607.gff3", f'results/repeats/{GENOME}_repeats.bed'
-    output: "results/gene_models/gene_models_final.gtf"
-    conda: '../envs/pybedtools.yaml'
-    script: "../scripts/filt_repeats_gtf2.py"
 

@@ -30,19 +30,20 @@ rule select_mikado_train:
 
 
 rule strict_repeat_filter_for_train:
-    input: "results/augustus_train/training.gff3"
+    input: "results/augustus_train/training.gff3", f"resources/genome/{GENOME}.fa.out.bed"
     output: "results/augustus_train/training_filter.gff3"
     conda: "../envs/pybedtools.yaml"
-    script: "../scripts/filt_repeat_gtf2.py"
+    params: frac = 0.9
+    script: "../scripts/filt_repeats_gtf2.py"
 
 
 rule train_augustus:
     input: gff = "results/augustus_train/training_filter.gff3",
            g = config["genome"]+".masked"
-    output: "results/augustus_training/autoAugTrain/training/test/augustus.2.withoutCRF.out"
+    output: "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out"
     conda: '../envs/augustus.yaml'
     params: spname = GENOME, odir = "results/augustus_training"
-    shell: "mkdir -p {params.odir} && autoAugTrain.pl --trainingset={input.gff} --genome={input.g} "
+    shell: "mkdir -p {params.odir} && autoAugTrain.pl --trainingset={input.gff} --genome={input.g} --CRF "
            "--species={params.spname} --workingdir={params.odir} --optrounds=1 --verbose --useexisting"
 
 
@@ -120,27 +121,27 @@ rule cat_hints:
   shell: "cat {input} > {output}"
 
 
-# rule split_fasta:
-#     input: genome = config["genome"] + ".masked"
-#     output: temp(expand('.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked",\
-#                         i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)]))
-#     conda: "../envs/pyfasta.yaml"
-#     shell: "pyfasta split {input} -n 20"
+rule split_fasta:
+    input: genome = config["genome"] + ".masked"
+    output: temp(expand('.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked",\
+                        i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)]))
+    conda: "../envs/pyfasta.yaml"
+    shell: "pyfasta split {input} -n 20"
 
-# rule augustus:
-#     input: hints = "results/hints_for_augustus/hints.gff",
-#            c = config.get("augustus_config"),
-#            train = "results/augustus_training/autoAugTrain/training/test/augustus.2.withoutCRF.out",
-#            genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
-#     output: f"results/augustus/{GENOME}.{{i}}.aug.out"
-#     params: sp = GENOME
-#     conda: '../envs/augustus.yaml'
-#     shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
-#            "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
-#            "--alternatives-from-evidence=false {input.genome} > {output}"
+rule augustus:
+    input: hints = "results/hints_for_augustus/hints.gff",
+           c = config.get("augustus_config"),
+           train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
+           genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
+    output: f"results/augustus/{GENOME}.{{i}}.aug.out"
+    params: sp = GENOME
+    conda: '../envs/augustus.yaml'
+    shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
+           "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
+           "--alternatives-from-evidence=false {input.genome} > {output}"
 
 
-# rule cat_augustus:
-#     input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
-#     output: f"results/augustus/{GENOME}.aug.gff3"
-#     shell: "cat {input} | grep -v '^#' > {output}"
+rule cat_augustus:
+    input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
+    output: f"results/augustus/{GENOME}.aug.gff3"
+    shell: "cat {input} | grep -v '^#' > {output}"
