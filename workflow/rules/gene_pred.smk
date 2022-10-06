@@ -30,7 +30,7 @@ rule select_mikado_train:
 
 
 rule strict_repeat_filter_for_train:
-    input: "results/augustus_train/training.gff3", f"resources/genome/{GENOME}.fa.out.bed"
+    input: "results/augustus_train/training.gff3", config["genome"]+".out.gff"
     output: "results/augustus_train/training_filter.gff3"
     conda: "../envs/pybedtools.yaml"
     params: frac = 0.9

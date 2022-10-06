@@ -15,7 +15,7 @@ rule pasa_prepare_db:
            u = "results/mikado/mikado.subloci.fasta", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt")
     output: touch("results/pasa/.created_db"), "results/pasa/GenomeMik.sqlite"
     conda: "../envs/pasa.yaml"
-    threads: 16
+    threads: 1
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/Launch_PASA_pipeline.pl -c {input.c} -C -r -R -g {input.g} -t {input.t} "
            "-T -u {input.u} --ALIGNERS blat,gmap --CPU {threads}"
 
@@ -27,7 +27,7 @@ rule pasa_load:
 
 
 rule pasa_run_1:
-    input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t =  "results/mikado/mikado.subloci.fasta.clean", l = "results/pasa/.loaded_augustus"
+    input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config_comp.txt"), t =  "results/mikado/mikado.subloci.fasta.clean", l = "results/pasa/.loaded_augustus"
     output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
@@ -41,7 +41,7 @@ rule pasa_update_db:
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/scripts/Load_Current_Gene_Annotations.dbi -c {input.c} -g {input.g} -P {input.p}"
 
 rule pasa_run_2:
-    input: up = "results/pasa/.updated_db_after_run1", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), t =  "results/mikado/mikado.subloci.fasta.clean",
+    input: up = "results/pasa/.updated_db_after_run1", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config_comp.txt"), t =  "results/mikado/mikado.subloci.fasta.clean",
     output: "GenomeMik.sqlite.gene_structures_post_PASA_updates.2760253.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16

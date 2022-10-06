@@ -6,3 +6,4 @@ channels:
 dependencies:
   - mikado
   - networkx<2
+  - sqlalchemy=1.2.12
