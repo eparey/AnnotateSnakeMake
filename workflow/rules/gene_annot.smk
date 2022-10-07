@@ -1,7 +1,7 @@
 rule format_aug_for_pasa:
     input: f"results/augustus/{GENOME}.aug.gff3"
     output: f"results/augustus/{GENOME}.aug.ok-for-pasa.gff3"
-    shell: "python ../scripts/aug_to_pasa.py"
+    script: "../scripts/aug_to_pasa.py"
 
 rule prepare_mikado_transcriptome_for_pasa:
     input: g = config["genome"] + ".masked", t = "results/mikado/mikado.subloci.gff3"

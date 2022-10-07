@@ -4,11 +4,11 @@ include: "rules/repeats.smk"
 include: "rules/transcriptome_using_genome.smk"
 include: "rules/transcriptome_de_novo.smk"
 include: "rules/consensus_transcriptome.smk"
-include: "rules/gene_pred.smk"
-# include: "rules/gene_annot.smk"
+# include: "rules/gene_pred.smk"
+include: "rules/gene_annot.smk"
 # include: "rules/gene_filter.smk"
 # "results/metaeuk/pred_results.gff", "results/mikado/mikado.loci.gff3",
 # "results/pfam/unfiltered.genes.pfam-domains.txt", "results/pfam/.end"
 rule all:
-    input: "results/hints_for_augustus/hints.gff", f"results/augustus/{GENOME}.aug.gff3", "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out"#"GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3", "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out" #f"results/gene_models/gene_models_final.gtf", f"results/augustus/{GENOME}.aug.gff3", #"results/augustus_training/autoAugTrain/training/test/augustus.2.withoutCRF.out", "results/hints_for_augustus/hints.gff", 'results/trinity_mapped/Trinity_transcripts.gff3', "results/stringtie/assemblies_gtf.txt", "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed"
+    input: "results/hints_for_augustus/hints.gff", "GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3"#"results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out"#"GenomeMik.sqlite.gene_structures_post_PASA_updates.2161850.gff3", "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out" #f"results/gene_models/gene_models_final.gtf", f"results/augustus/{GENOME}.aug.gff3", #"results/augustus_training/autoAugTrain/training/test/augustus.2.withoutCRF.out", "results/hints_for_augustus/hints.gff", 'results/trinity_mapped/Trinity_transcripts.gff3', "results/stringtie/assemblies_gtf.txt", "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed"
      
