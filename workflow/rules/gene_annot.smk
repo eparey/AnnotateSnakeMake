@@ -1,4 +1,7 @@
-
+rule format_aug_for_pasa:
+    input: f"results/augustus/{GENOME}.aug.gff3"
+    output: f"results/augustus/{GENOME}.aug.ok-for-pasa.gff3"
+    shell: "python ../scripts/aug_to_pasa.py"
 
 rule prepare_mikado_transcriptome_for_pasa:
     input: g = config["genome"] + ".masked", t = "results/mikado/mikado.subloci.gff3"
@@ -20,7 +23,7 @@ rule pasa_prepare_db:
            "-T -u {input.u} --ALIGNERS blat,gmap --CPU {threads}"
 
 rule pasa_load:
-    input: p = f"results/augustus/{GENOME}.aug.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), d = "results/pasa/.created_db"
+    input: p = f"results/augustus/{GENOME}.aug.ok-for-pasa.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt"), d = "results/pasa/.created_db"
     output: touch("results/pasa/.loaded_augustus")
     conda: "../envs/pasa.yaml"
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/scripts/Load_Current_Gene_Annotations.dbi -c {input.c} -g {input.g} -P {input.p}"
