@@ -6,8 +6,9 @@ rule trinity:
     threads: 24
     params: odir = lambda w, output: os.path.dirname(output[0]), cpu_bfly = 4
     # conda: "../envs/trinity.yaml"
-    shell: "Trinity --trimmomatic --seqType fq --samples_file {input.samples} --CPU {threads} --max_memory 300G --output {params.odir} && "
-           "rm -r {params.odir}/read_partitions/ "
+    shell: "Trinity --trimmomatic --seqType fq --samples_file {input.samples} --CPU {threads} "
+           "--max_memory 300G --output {params.odir}  --full_cleanup"
+
 
 
 rule gmap_db:
@@ -20,7 +21,7 @@ rule gmap_db:
 
 rule gmap:
     input: fa = "results/trinity/Trinity.fasta", db = directory("results/gmapdb/")
-    output: 'results/trinity_mapped/Trinity_transcripts.gff3'
+    output: 'results/trinity/Trinity_transcripts.gff3'
     params: g = GENOME
     threads: 20
     shell: "gmap -d {params.g} -D {input.db} -f 3 -n 0 -x 50 -t {threads} -B 5 --gff3-add-separators=0 "
