@@ -1,25 +1,4 @@
 
-#rule exclude_repeats
-
-# rule prepare_taco_output:
-#     input: "results/transdecoder/transcripts.fa.transdecoder.genome.gff3"
-#     output: "results/transdecoder/transcripts.fa.transdecoder.genome.non-red.gff3"
-#     run:
-#         with open(input[0], 'r') as infile, open(output[0], 'w') as out:
-#             prec = ''
-#             for line in infile:
-#                 if len(line.strip().split('\t'))< 3:
-#                     continue
-#                 feature_type = line.strip().split('\t')[2]
-#                 if feature_type not in ['gene', 'mRNA']:
-#                     continue
-
-#                 if prec == feature_type:
-#                     continue
-
-#                 out.write(line)
-
-#                 prec = feature_type
 
 rule select_mikado_train:
     input: "results/mikado/mikado.loci.metrics.tsv", "results/mikado/mikado.loci.gff3"

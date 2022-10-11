@@ -34,31 +34,31 @@ rule pasa_load:
 
 rule pasa_run_1:
     input: g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config_comp.txt"), t =  "results/mikado/mikado.subloci.fasta.clean", l = "results/pasa/.loaded_augustus"
-    output: f"results/pasa/{GENOME}_pasa1_tmp.gff3"
+    output: f"results/pasa/pasa1_tmp.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
-    shell: "rm GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 && "
+    shell: "rm GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 || true && "
            "${{CONDA_PREFIX}}/opt/pasa-2.5.2/Launch_PASA_pipeline.pl -c {input.c} -A -g {input.g} -t {input.t} --CPU {threads} && "
            "mv GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 {output}"
 
 rule pasa_update_db:
-    input: p = f"results/pasa/{GENOME}_pasa1_tmp.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt")
+    input: p = f"results/pasa/pasa1_tmp.gff3", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config.txt")
     output: touch("results/pasa/.updated_db_after_run1")
     conda: "../envs/pasa.yaml"
     shell: "${{CONDA_PREFIX}}/opt/pasa-2.5.2/scripts/Load_Current_Gene_Annotations.dbi -c {input.c} -g {input.g} -P {input.p}"
 
 rule pasa_run_2:
     input: up = "results/pasa/.updated_db_after_run1", g = config["genome"] + ".masked", c = config.get("pasa_conf", "../AnnotateSnakeMake/config/pasa_config_comp.txt"), t =  "results/mikado/mikado.subloci.fasta.clean"
-    output: f"results/pasa/{GENOME}_pasa_gene_models_final.gff3"
+    output: f"results/pasa/pasa_gene_models.gff3"
     conda: "../envs/pasa.yaml"
     threads: 16
-    shell: "rm GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 && "
+    shell: "rm GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 || true && "
            "${{CONDA_PREFIX}}/opt/pasa-2.5.2/Launch_PASA_pipeline.pl -c {input.c} -A -g {input.g} -t {input.t} --CPU {threads} && "
            "mv GenomeMik.sqlite.gene_structures_post_PASA_updates.*.gff3 {output}"
 
 rule clean_after_pasa:
-    input: run2 =  f"results/pasa/{GENOME}_pasa_gene_models_final.gff3"
-    output: f"results/pasa/.end"
+    input: run2 =  "results/pasa/pasa_gene_models.gff3"
+    output: "results/pasa/.end"
     params: odir = lambda w, output: os.path.dirname(output[0]) + '/tmp/'
     shell: "rm -r  __pasa_GenomeMik.sqlite* && mv GenomeMik.sqlite* {params.odir} "
            "mv alignment.validations.output {params.odir} && mv pasa_run.log.dir logs/"

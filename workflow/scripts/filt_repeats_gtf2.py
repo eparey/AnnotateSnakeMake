@@ -13,13 +13,12 @@ input_bed = snakemake.input[1] #"../GenomeAnnotationAmphiura/resources/genome/Af
 output = snakemake.output[0] #'test.gff' #
 
 
-cutoff_f = 0.1
+cutoff_f = float(snakemake.params[1])
 filt_ex_prop = float(snakemake.params[0])
 
 genes = BedTool(input_gtf)
 genes = genes.remove_invalid().saveas()
 
-exons=genes.filter(lambda x: x[2] == 'CDS').saveas()
 exons=genes.filter(lambda x: x[2] == 'exon').saveas()
 print(len(exons), 'exons...')
 
