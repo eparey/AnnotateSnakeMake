@@ -12,5 +12,5 @@ include: "rules/gene_annot.smk"
 # "results/pfam/unfiltered.genes.pfam-domains.txt", "results/pfam/.end"
 
 rule all:
-    input:  "results/pasa/pasa_gene_models.gff3"#"results/filter_models/genes.svg", "results/filter_models/pfam.svg", "results/filter_models/busco.svg"#"results/pfam/.end"#"results/filter_models/longest_isoform.gff", #"results/pasa/.end"
+    input:  "results/pasa/.end"#"results/filter_models/genes.svg", "results/filter_models/pfam.svg", "results/filter_models/busco.svg"#"results/pfam/.end"#"results/filter_models/longest_isoform.gff", #"results/pasa/.end"
              #expand("results/filter_models/gene_models.filt.{i}.gff3", i=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])

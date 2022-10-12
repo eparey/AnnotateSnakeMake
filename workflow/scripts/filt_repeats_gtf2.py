@@ -19,28 +19,28 @@ filt_ex_prop = float(snakemake.params[0])
 genes = BedTool(input_gtf)
 genes = genes.remove_invalid().saveas()
 
-exons=genes.filter(lambda x: x[2] == 'CDS').saveas()
+exons =g enes.filter(lambda x: x[2] == 'CDS').saveas()
 print(len(exons), 'exons...')
 
-nbExGene=defaultdict(int)
+nbExGene = defaultdict(int)
 for i, exon in enumerate(exons):
     nbExGene[exon.attrs['Parent']]+=1
 
-repeats=BedTool(input_bed)
+repeats = BedTool(input_bed)
 
-exofilt=exons.intersect(repeats, f=cutoff_f, v=True)
+exofilt = exons.intersect(repeats, f=cutoff_f, v=True)
 
-nbFiltEx=defaultdict(int)
+nbFiltEx = defaultdict(int)
 
 for exon in exofilt:
     nbFiltEx[exon.attrs['Parent']]+=1
 
-kept=[]
-histex=defaultdict(int)
+kept = []
+histex = defaultdict(int)
 for gene in nbExGene:
-    nfilt=nbFiltEx.get(gene, 0)
-    nexon=nbExGene[gene]
-    histex['{0}:{1}'.format(nfilt, nexon)]+=1
+    nfilt = nbFiltEx.get(gene, 0)
+    nexon = nbExGene[gene]
+    histex['{0}:{1}'.format(nfilt, nexon)] += 1
     if nfilt/float(nexon) > filt_ex_prop:
         kept.append(gene)
 
