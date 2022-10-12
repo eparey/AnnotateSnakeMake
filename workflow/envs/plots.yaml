@@ -1,0 +1,8 @@
+name: plots
+channels:
+  - conda-forge
+dependencies:
+  - matplotlib
+  - pandas
+  - python=3.10
+  - seaborn

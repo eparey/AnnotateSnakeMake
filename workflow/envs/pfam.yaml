@@ -1,0 +1,8 @@
+name: pfam
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pfam_scan
+  - emboss

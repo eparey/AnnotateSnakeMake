@@ -19,7 +19,7 @@ filt_ex_prop = float(snakemake.params[0])
 genes = BedTool(input_gtf)
 genes = genes.remove_invalid().saveas()
 
-exons=genes.filter(lambda x: x[2] == 'exon').saveas()
+exons=genes.filter(lambda x: x[2] == 'CDS').saveas()
 print(len(exons), 'exons...')
 
 nbExGene=defaultdict(int)

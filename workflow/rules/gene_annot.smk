@@ -1,7 +1,7 @@
-#FIXME: add a post-deploy in conda to run pasa 
+#FIXME: add a post-deploy in conda to run pasa without calling conda_prefix
 
 rule format_aug_for_pasa:
-    input: f"results/augustus/{GENOME}.aug.gff3"
+    input:  "results/filter_models/gene_models.filt.0.6.gff3"#f"results/augustus/gene_models_filter0.6.gff" #f"results/augustus/{GENOME}.aug.gff3"
     output: f"results/augustus/{GENOME}.aug.ok-for-pasa.gff3"
     script: "../scripts/aug_to_pasa.py"
 
