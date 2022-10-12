@@ -71,7 +71,7 @@ rule busco_filt:
     shell: "busco -l metazoa_odb10 --tar --mode proteins -o {params.jname} -f -i {input} --cpu {threads} --out_path {params.odir}"
 
 rule plot_busco:
-    input: nof = "busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json",
+    input: nof = "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json",
            f = expand("results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json",
                       i=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
     output: "results/filter_models/busco.svg"
