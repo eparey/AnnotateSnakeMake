@@ -64,7 +64,7 @@ rule plot_pfam:
 
 rule busco_filt:
     input: "results/filter_models/pep.filt{i}.fa"
-    output: "busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json"
+    output: "results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json"
     params: jname = lambda w: "busco_filter" + w.i, odir = "results/busco/"
     threads: 4
     conda: "../envs/busco.yaml"
@@ -72,7 +72,7 @@ rule busco_filt:
 
 rule plot_busco:
     input: nof = "busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json",
-           f = expand("busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json",
+           f = expand("results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json",
                       i=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
     output: "results/filter_models/busco.svg"
     conda: "../envs/plots.yaml"
