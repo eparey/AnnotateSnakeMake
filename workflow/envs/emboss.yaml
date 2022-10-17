@@ -1,0 +1,5 @@
+name: emboss
+channels:
+  - bioconda
+dependencies:
+  - emboss
