@@ -1,7 +1,7 @@
 #FIXME: add a post-deploy in conda to run pasa without calling conda_prefix
 
 rule format_aug_for_pasa:
-    input:  "results/filter_models/gene_models.filt.0.6.gff3"#f"results/augustus/gene_models_filter0.6.gff" #f"results/augustus/{GENOME}.aug.gff3"
+    input:  "results/filter_models/gene_models.filt.0.6.gff"#f"results/augustus/gene_models_filter0.6.gff3" #f"results/augustus/{GENOME}.aug.gff3"
     output: f"results/augustus/{GENOME}.aug.ok-for-pasa.gff3"
     script: "../scripts/aug_to_pasa.py"
 
@@ -58,7 +58,9 @@ rule pasa_run_2:
 
 rule clean_after_pasa:
     input: run2 =  "results/pasa/pasa_gene_models.gff3"
-    output: "results/pasa/.end"
-    params: odir = lambda w, output: os.path.dirname(output[0]) + '/tmp/'
-    shell: "rm -r  __pasa_GenomeMik.sqlite* && mv GenomeMik.sqlite* {params.odir} "
-           "mv alignment.validations.output {params.odir} && mv pasa_run.log.dir logs/"
+    output: touch("results/pasa/.end")
+    # params: odir = lambda w, output: os.path.dirname(output[0]) + '/tmp/'
+    shell: "rm -r  __pasa_GenomeMik.sqlite* || true && rm GenomeMik.sqlite* || true && "
+           "rm alignment.validations.output || true && mv pasa_run.log.dir logs/ || true && "
+           "rm blat.spliced_alignments.gff3 && rm 11.ooc && rm tmp-* && rm -r pblat_outdir/ &&"
+           "rm gmap.spliced_alignments.gff* "
