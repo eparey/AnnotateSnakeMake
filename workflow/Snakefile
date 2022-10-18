@@ -10,4 +10,4 @@ include: "rules/gene_annot.smk"
 include: "rules/final_models.smk"
 
 rule all:
-    input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json"
+    input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/final_annotation/pfam/pfam-domains.txt"

@@ -16,7 +16,7 @@ rule star_index:
     Build a genome index for STAR
     """
     input: config["genome"]+".masked"
-    output: directory("resources/star_index")
+    output: temp(directory("resources/star_index"))
     log: "logs/star_index_genome.log"
     conda: "../envs/star.yaml"
     threads: 6
@@ -93,7 +93,7 @@ rule portcullis:
     Extract curated splice junctions
     """
     input: b = "results/star/merged.bams", g = config["genome"]+'.masked'
-    output: "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed", "results/portcullis/portcullis.filtered.bam"
+    output: "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed", temp("results/portcullis/portcullis.filtered.bam")
     params: odir = "results/portcullis/"
     conda: '../envs/portcullis.yaml'
     threads: 20

@@ -51,10 +51,9 @@ rule busco_final:
 
 
 rule pfam_final:
-    input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", hmm = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm"
-    output: out = "results/final_annotation/pfam/pfam-domains.txt",
-            db = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm.h3i"
+    input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm.h3i"
+    output: "results/final_annotation/pfam/pfam-domains.txt"
     conda: "../envs/pfam.yaml"
     params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
     threads: 8
-    shell: "hmmpress -f {input.hmm} && pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output.out} -cpu {threads}"
+    shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output} -cpu {threads}"
