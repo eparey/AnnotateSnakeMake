@@ -8,7 +8,7 @@ rule to_gtf:
 		pasa = "results/pasa/pasa_gene_models.gff3",
 		clm = "results/pasa/.end"
 	output: f"results/final_annotation/{GENOME}.gtf"
-	params: config.get("species_3letters_code", "AFI") 
+	params: config["species_3letters_code"] 
 	script: "../scripts/format_final_gtf.py"
 
 
