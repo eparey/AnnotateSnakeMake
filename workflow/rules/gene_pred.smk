@@ -67,14 +67,24 @@ rule mikado_to_hint:
 #            "mmseqs createsubdb resources/metaeuk/metazoa_clust_DB resources/metaeuk/metazoa_DB_h resources/metaeuk/metazoa_RepDb_h && " 
 #            "mmseqs result2profile resources/metaeuk/metazoa_RepDb resources/metaeuk/metazoa_DB resources/metaeuk/metazoa_clust_DB resources/metaeuk/metazoa_profile.DB"
 
-rule metaeuk:
-    input: genome =  config["genome"]+'.masked', profile = config["prot_fasta"]
-    output: out = "results/metaeuk/pred_results.gff"
-    params: output = lambda w, output: output[0].replace(".gff", ''), tmp = "results/metaeuk/tmp/"
-    conda: "../envs/metaeuk.yaml"
-    threads: 30
-    shell: "metaeuk easy-predict {input.genome} {input.profile} {params.output} {params.tmp} --threads {threads} && "
-           "rm -r {params.tmp}"
+if config['metaeuk_only']:
+    rule metaeuk_full_annot:
+        input: genome =  config["genome"]+'.masked', profile = config["prot_fasta"]
+        output: out = "results/metaeuk.gff"
+        params: output = lambda w, output: output[0].replace(".gff", ''), tmp = "results/metaeuk/tmp/"
+        conda: "../envs/metaeuk.yaml"
+        threads: 30
+        shell: "metaeuk easy-predict {input.genome} {input.profile} {params.output} {params.tmp} --threads {threads} && "
+               "rm -r {params.tmp}"
+else:
+    rule metaeuk:
+        input: genome =  config["genome"]+'.masked', profile = config["prot_fasta"]
+        output: out = "results/metaeuk/pred_results.gff"
+        params: output = lambda w, output: output[0].replace(".gff", ''), tmp = "results/metaeuk/tmp/"
+        conda: "../envs/metaeuk.yaml"
+        threads: 30
+        shell: "metaeuk easy-predict {input.genome} {input.profile} {params.output} {params.tmp} --threads {threads} && "
+               "rm -r {params.tmp}"
 
 rule metaeuk_to_gtf:
     input: "results/metaeuk/pred_results.gff"
@@ -107,20 +117,20 @@ rule split_fasta:
     conda: "../envs/pyfasta.yaml"
     shell: "pyfasta split {input} -n 20"
 
-rule augustus:
-    input: hints = "results/hints_for_augustus/hints.gff",
-           c = config.get("augustus_config"),
-           train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
-           genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
-    output: f"results/augustus/{GENOME}.{{i}}.aug.out"
-    params: sp = GENOME
-    conda: '../envs/augustus.yaml'
-    shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
-           "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
-           "--alternatives-from-evidence=false {input.genome} > {output}"
+# rule augustus:
+#     input: hints = "results/hints_for_augustus/hints.gff",
+#            c = config.get("augustus_config"),
+#            train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
+#            genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
+#     output: f"results/augustus/{GENOME}.{{i}}.aug.out"
+#     params: sp = GENOME
+#     conda: '../envs/augustus.yaml'
+#     shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
+#            "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
+#            "--alternatives-from-evidence=false {input.genome} > {output}"
 
 
-rule cat_augustus:
-    input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
-    output: f"results/augustus/{GENOME}.aug.gff3"
-    shell: "cat {input} | grep -v '^#' > {output}"
+# rule cat_augustus:
+#     input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
+#     output: f"results/augustus/{GENOME}.aug.gff3"
+#     shell: "cat {input} | grep -v '^#' > {output}"

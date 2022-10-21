@@ -25,6 +25,15 @@ with open(infile, 'r') as f:
         else:
             seq += line
 
+
+    if seq:
+        if gene not in res:
+            res[gene] = (seq, transcript)
+        elif len(seq) > len(res[gene][0]):
+            res[gene] = (seq, transcript)
+
+
+
 with open(outfile, 'w') as out:
     for gene in res:
         seq, transcript = res[gene]

@@ -1,13 +1,20 @@
 
 include: "rules/common.smk"
 include: "rules/repeats.smk"
-include: "rules/transcriptome_using_genome.smk"
-include: "rules/transcriptome_de_novo.smk"
-include: "rules/consensus_transcriptome.smk"
+
+if not config.get('metaeuk_only', ''):
+    config['metaeuk_only'] = ''
+    include: "rules/transcriptome_using_genome.smk"
+    include: "rules/transcriptome_de_novo.smk"
+    include: "rules/consensus_transcriptome.smk"
+
 include: "rules/gene_pred.smk"
 include: "rules/filter_repeats.smk"
 include: "rules/gene_annot.smk"
 include: "rules/final_models.smk"
 
+
+#"results/final_annotation/pfam/pfam-domains.txt",
+
 rule all:
-    input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/final_annotation/pfam/pfam-domains.txt"
+    input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg"

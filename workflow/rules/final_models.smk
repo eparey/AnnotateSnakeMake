@@ -2,14 +2,22 @@
 Final busco and pfam, pep file and gtf final
 """
 
+if config['metaeuk_only']:
+	rule meta_to_gtf:
+		input: 
+			pasa = "results/filter_models/gene_models.filt.0.6.gff3",
+		output: f"results/final_annotation/{GENOME}.gtf"
+		params: config["species_3letters_code"] 
+		script: "../scripts/format_final_gtf.py"
 
-rule to_gtf:
-	input: 
-		pasa = "results/pasa/pasa_gene_models.gff3",
-		clm = "results/pasa/.end"
-	output: f"results/final_annotation/{GENOME}.gtf"
-	params: config["species_3letters_code"] 
-	script: "../scripts/format_final_gtf.py"
+else:
+	rule to_gtf:
+		input: 
+			pasa = "results/pasa/pasa_gene_models.gff3",
+			clm = "results/pasa/.end"
+		output: f"results/final_annotation/{GENOME}.gtf"
+		params: config["species_3letters_code"] 
+		script: "../scripts/format_final_gtf.py"
 
 
 rule get_cds:
