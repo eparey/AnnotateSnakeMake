@@ -52,7 +52,7 @@ rule prepare_landscape:
     output: f'results/repeats/{GENOME}_summary.divsum'
     conda: "../envs/repeats.yaml"
     log: "logs/repeats/prepare_landscape.log"
-    shell: "calcDivergenceFromAlign.pl -s {output} {input} 2>&1 | tee"
+    shell: "calcDivergenceFromAlign.pl -s {output} {input} 2>&1 | tee {log}"
 
 
 rule repeat_landscape:
@@ -66,4 +66,3 @@ rule repeat_landscape:
     conda: "../envs/repeats.yaml" 
     shell: "createRepeatLandscape.pl -div {input.div} -g {params.gsize} > {output} 2>&1 | tee {log}"
 
-#TODO: add plots to snakemake report
