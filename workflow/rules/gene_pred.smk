@@ -74,7 +74,7 @@ if config['metaeuk_only']:
         params: output = lambda w, output: output[0].replace(".gff", ''), tmp = "results/metaeuk/tmp/"
         conda: "../envs/metaeuk.yaml"
         threads: 30
-        shell: "metaeuk easy-predict {input.genome} {input.profile} {params.output} {params.tmp} --threads {threads} && "
+        shell: "mkdir -p {params.tmp} && metaeuk easy-predict {input.genome} {input.profile} {params.output} {params.tmp} --threads {threads} && "
                "rm -r {params.tmp}"
 else:
     rule metaeuk:
