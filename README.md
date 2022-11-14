@@ -1,0 +1,1 @@
+snakemake --configfile ../QuickAnnotMglacialis/config.yaml --directory ../QuickAnnotMglacialis/ --use-conda --cores 9 --until plot_busco

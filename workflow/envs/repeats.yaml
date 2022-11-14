@@ -4,5 +4,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - repeatmasker=4.1.2
-  - repeatmodeler=2.0.2
+  - recon=1.08=hec16e2b_4
+  - repeatmasker=4.1.2.p1=pl5262hdfd78af_0
+  - repeatmodeler=2.0.2a=pl5262h9ee0642_0
+  - repeatscout=1.0.6=hec16e2b_3
+  - rmblast=2.10.0=h2d02072_0
