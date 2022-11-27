@@ -48,6 +48,17 @@ rule get_pep_longest_transcript:
 	conda: "../envs/emboss.yaml"
 	shell: "transeq {input} {output} && sed -i 's/_1$//' {output}"
 
+rule blast_swissprot:
+	input: db = config["diamond"], sp = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"
+	output: f"results/final_annotation/swissprot_blast_result.blp"
+	conda: "../envs/mikado.yaml"
+	threads: 5
+	shell: "diamond blastp --query {input.sp} --db {input.db} --max-hsps 1 --evalue 1e-5 --outfmt 6 --out {output} -p {threads}"
+
+rule add_genenames:
+	input: gtf = f"results/final_annotation/{GENOME}.gtf", blasts = f"results/final_annotation/swissprot_blast_result.blp"
+	output: f"results/final_annotation/{GENOME}.with.names.gtf", "results/final_annotation/table_ids_names.tsv"
+	script: "../scripts/add_names_swissblast.py"
 
 rule busco_final:
     input: f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"

@@ -18,7 +18,7 @@ if not config.get('repeats_only', ''):
     #"results/final_annotation/pfam/pfam-domains.txt",
 
     rule all:
-        input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg"
+        input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg", f"results/final_annotation/{GENOME}.with.names.gtf"
 
 # # else:
 #     rule all: f'results/repeats/{GENOME}_repeat_landscape.html'

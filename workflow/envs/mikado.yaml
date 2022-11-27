@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - diamond=2.0.14
   - mikado
   - networkx<2
   - sqlalchemy=1.2.12
