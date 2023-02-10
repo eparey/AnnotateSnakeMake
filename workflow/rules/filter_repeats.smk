@@ -7,16 +7,20 @@ if config['metaeuk_only']:
     rule metaeuk_cds_to_fasta:
         input: gff = "results/metaeuk.ok.gff",
                genome = config["genome"] + ".masked"
-        output: "results/augustus/pep.fa"
-        conda: "../envs/agat.yaml"
-        shell: 'agat_sp_extract_sequences.pl --gff {input.gff} -f {input.genome} -o {output} -t CDS --merge -p'
+        output: out = "results/augustus/pep.fa", tmp = "results/augustus/pep.tmp.fa" #dummy awk to uniquely identify seq
+        conda: "../envs/pasa.yaml"
+        shell: """
+            gffread -y {output.tmp} -g {input.genome} {input.gff} && awk '{{if($0~"^>") {{print $0NR}} else{{print $0}}}}' {output.tmp} | sed s#/#-#g > {output.out}
+        """
 else:
     rule cds_to_fasta:
         input: gff = f"results/augustus/{GENOME}.aug.gff3",
                genome = config["genome"] + ".masked"
         output: "results/augustus/pep.fa"
-        conda: "../envs/agat.yaml"
-        shell: 'agat_sp_extract_sequences.pl --gff {input.gff} -f {input.genome} -o {output} -t CDS --merge -p'
+        conda: "../envs/pasa.yaml"
+        shell: """
+            gffread -y {output} -g {input.genome} {input.gff}
+        """
 
 
 #hmmpress -f {input.hmm} #hmm = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm"
@@ -31,13 +35,11 @@ rule pfam_scan:
 rule busco:
     input: "results/augustus/pep.fa"
     output:
-        out = "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json",    
-        tmp = "results/augustus/pep.ok.fa"
+        out = "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json"
     threads: 4
     conda: "../envs/busco.yaml"
     params: odir = "results/busco/"
-    shell: "sed s#/#-#g {input} > {output.tmp} && "
-           "busco -l metazoa_odb10 --mode proteins --tar -o busco_unfilterred -f -i {output.tmp} --cpu {threads} --out_path {params.odir}"
+    shell: "busco -l metazoa_odb10 --mode proteins --tar -o busco_unfilterred -f -i {input} --cpu {threads} --out_path {params.odir}"
 
 
 if config['metaeuk_only']:
@@ -69,9 +71,11 @@ rule plot_nbgenes:
 
 rule cds_to_fasta_filtered:
     input: gff = "results/filter_models/gene_models.filt.{i}.gff3", genome = config["genome"] + ".masked"
-    output: "results/filter_models/pep.filt{i}.fa"
-    conda: "../envs/agat.yaml"
-    shell: 'agat_sp_extract_sequences.pl --gff {input.gff} -f {input.genome} -o {output} -t CDS --merge -p'
+    output: out = "results/filter_models/pep.filt{i}.fa", tmp = "results/filter_models/pep.filt{i}.tmp.fa"
+    conda: "../envs/pasa.yaml"
+    shell: """
+        gffread -y {output.tmp} -g {input.genome} {input.gff} && awk '{{if($0~"^>") {{print $0NR}} else{{print $0}}}}' {output.tmp} | sed s#/#-#g > {output.out}
+    """
 
 
 # rule pfam_scan_filt:
@@ -93,15 +97,15 @@ rule cds_to_fasta_filtered:
 
 
 rule busco_filt:
-    input: "results/filter_models/pep.filt{i}.fa", "results/augustus/pep.ok.fa" #dummy to ensure db is doznloqded
+    input:
+        "results/filter_models/pep.filt{i}.fa",
+         "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json" #dummy to ensure db is downloaded
     output:
-        out = "results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json",
-        tmp = "results/filter_models/pep.filt{i}.ok.fa"
+        out = "results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json"
     params: jname = lambda w: "busco_filter" + w.i, odir = "results/busco/"
     threads: 4
     conda: "../envs/busco.yaml"
-    shell: "sed s#/#-#g {input[0]} > {output.tmp} && "
-           "busco -l metazoa_odb10 --mode proteins --tar -o {params.jname} -f -i {output.tmp} --cpu {threads} --out_path {params.odir}"
+    shell: "busco -l metazoa_odb10 --mode proteins --tar -o {params.jname} -f -i {input[0]} --cpu {threads} --out_path {params.odir}"
 
 
 rule plot_busco:
