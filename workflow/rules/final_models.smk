@@ -98,5 +98,5 @@ rule format_bed:
 	input: lgest = f"results/final_annotation/{GENOME}_longest-isoform.txt", bed = f"results/final_annotation/{GENOME}.with.names.tmp.bed"
 	output: f"results/final_annotation/{GENOME}.with.names.bed"
 	shell: """
-	grep -Fwf {input.lgest} {input.bed} | grep mRNA | cut -f 1,2,3,4,6,10 | cut -f 1,6 -d '"' | sed 's/gene_id "//g' | awk -F '\t' '{$(NF-1)="." FS $(NF-1);}1' OFS='\t'> {output}
+	grep -Fwf {input.lgest} {input.bed} | grep mRNA | cut -f 1,2,3,4,6,10 | cut -f 1,6 -d '"' | sed 's/gene_id "//g' | awk -F '\t' '{{$(NF-1)="." FS $(NF-1);}}1' OFS='\t'> {output}
 	"""

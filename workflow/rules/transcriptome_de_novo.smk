@@ -4,11 +4,10 @@ rule trinity:
            samples = config["rna_samples"]
     output: "results/trinity/Trinity.fasta"
     threads: 24
-    params: odir = lambda w, output: os.path.dirname(output[0]), cpu_bfly = 4
-    # conda: "../envs/trinity.yaml"
+    params: odir = lambda w, output: os.path.dirname(output[0])
+    conda: "../envs/trinity.yaml"
     shell: "Trinity --trimmomatic --seqType fq --samples_file {input.samples} --CPU {threads} "
-           "--max_memory 300G --output {params.odir}  --full_cleanup"
-
+           "--max_memory 300G --output {params.odir} --full_cleanup"
 
 
 rule gmap_db:

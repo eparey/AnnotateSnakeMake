@@ -40,17 +40,6 @@ rule mikado_diamond:
            "--threads {threads} --db {input.db} --evalue 1e-6 --outfmt 5 --out {output}"
 
 
-# rule transcripts_to_gff3:
-#     """
-#     Prepare a gff3 file of transcripts for TransDecoder
-#     """
-#     input: "results/mikado/mikado_prepared.gtf"
-#     output: "results/mikado/mikado_prepared.gff3"
-#     log: "logs/transdecoder/to_gff3.log"
-#     conda: "../envs/transdecoder.yaml"
-#     shell: "gtf_to_alignment_gff3.pl {input} > {output} 2>&1 | tee {log}"
-
-
 rule transdecoder_predict:
     """
     Find coding regions within transcripts with TransDecoder
@@ -69,17 +58,6 @@ rule transdecoder_predict:
         "rm pipeliner* && rm -r mikado_prepared.fasta.transdecoder*"
 
 
-# rule transdecoder_to_genome:
-#     input: fa = "results/mikado/mikado_prepared.fasta", gff =  "results/mikado/mikado_prepared.gff3", gff_v2 = "mikado_prepared.fasta.transdecoder.gff3"
-#     output: gff = "results/mikado/mikado_transdecoder.gff3",
-#             bed = "results/mikado/mikado_transdecoder.bed"
-#     conda: "../envs/transdecoder.yaml"
-#     log: log1 = "logs/transdecoder/transdecoder.log", log2 = "logs/transdecoder/to_bed.log"
-#     shell:
-#         "cdna_alignment_orf_to_genome_orf.pl {input.gff_v2} {input.gff} {input.fa} > {output.gff} && "
-#         "gff3_file_to_bed.pl {output.gff}  | tail -n +3 > {output.bed} 2>&1 | tee {log.log2} && rm pipeliner* && rm -r mikado_prepared.fasta.transdecoder*"
-
-
 rule mikado_serialize:
     input: conf = "results/mikado/configuration.ok.yaml", blast = "results/mikado/mikado_diamond.xml",
            fa = config["diamond"].replace(".dmnd", ".fa"), bed =  "results/mikado/mikado_prepared.fasta.transdecoder.bed" #"results/mikado/mikado_transdecoder.bed"
@@ -89,11 +67,6 @@ rule mikado_serialize:
     shell: "mikado serialise --json-conf {input.conf} --xml {input.blast} --orfs {input.bed} "
            "--blast_targets {input.fa} -od {params.odir}"
 
-# rule mikado_fix:
-#     input:  "results/mikado/mikado.db"
-#     output: temp("mikado.db")
-#     conda: "../envs/mikado.yaml"
-#     shell: "cp {input} {output}"
 
 rule mikado_pick:
     input:  c = "results/mikado/configuration.ok.yaml", db="results/mikado/mikado.db" #"mikado.db"
