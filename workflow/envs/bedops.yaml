@@ -1,0 +1,6 @@
+name: bedops
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bedops
