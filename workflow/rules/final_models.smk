@@ -7,7 +7,7 @@ if config['metaeuk_only']:
 		input: 
 			pasa = "results/filter_models/gene_models.filt.0.6.gff3",
 		output: f"results/final_annotation/{GENOME}.gtf"
-		params: config["species_3letters_code"] 
+		params: config.get("species_3letters_code", 'GENE')
 		script: "../scripts/format_final_gtf.py"
 
 else:
@@ -16,7 +16,7 @@ else:
 			pasa = "results/pasa/pasa_gene_models.gff3",
 			clm = "results/pasa/.end"
 		output: f"results/final_annotation/{GENOME}.gtf"
-		params: config["species_3letters_code"] 
+		params: config.get("species_3letters_code", 'GENE')
 		script: "../scripts/format_final_gtf.py"
 
 

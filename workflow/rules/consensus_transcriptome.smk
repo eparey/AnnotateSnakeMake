@@ -6,7 +6,7 @@ rule mikado_configure:
         fa = config["diamond"].replace(".dmnd", ".fa"),
         g = config["genome"]+'.masked',
         assemblies = config["mikado"],
-        trinity = "results/trinity_mapped/Trinity_transcripts.gff3",
+        trinity = 'results/trinity/Trinity_transcripts.gff3',
         taco = "results/taco/assembly.gtf"
     output: temp("results/mikado/configuration.yaml"), "results/mikado/human_scoring.yaml"
     params: odir = lambda w, output: os.path.dirname(output[0])

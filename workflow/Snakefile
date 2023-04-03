@@ -15,10 +15,8 @@ if not config.get('repeats_only', ''):
     include: "rules/final_models.smk"
 
 
-    "results/final_annotation/pfam/pfam-domains.txt",
-
     rule all:
-        input: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg", f"results/final_annotation/{GENOME}.with.names.bed"
+        input: "results/final_annotation/pfam/pfam-domains.txt", "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg", f"results/final_annotation/{GENOME}.with.names.bed"
 
 # # else:
 #     rule all: f'results/repeats/{GENOME}_repeat_landscape.html'

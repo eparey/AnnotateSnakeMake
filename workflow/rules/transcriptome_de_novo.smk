@@ -19,7 +19,7 @@ rule gmap_db:
 
 
 rule gmap:
-    input: fa = "results/trinity/Trinity.fasta", db = directory("results/gmapdb/")
+    input: fa = "results/trinity/Trinity.fasta", db = "results/gmapdb/"
     output: 'results/trinity/Trinity_transcripts.gff3'
     params: g = GENOME
     threads: 20
