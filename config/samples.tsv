@@ -1,2 +1,2 @@
-#sample_name	rep	fastq1	fastq2
-1d-M-1_P6959_2024_subset	1d-M-1_P6959_2024_subset	resources/1d-M-1_P6959_2024_subset_R1_tr.fq.gz	resources/1d-M-1_P6959_2024_subset_R2_tr.fq.gz
+#sample_name	sample_id	fastq1	fastq2
+adult_arm	SRR1523743	SRR1523743_1-subsetscaf20.fastq.gz	SRR1523743_2-subsetscaf20.fastq.gz

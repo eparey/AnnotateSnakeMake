@@ -73,7 +73,7 @@ rule busco_final:
 
 
 rule pfam_final:
-    input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm.h3i"
+    input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = config['pfam_db']
     output: "results/final_annotation/pfam/pfam-domains.txt"
     conda: "../envs/pfam.yaml"
     params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"

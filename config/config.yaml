@@ -1,15 +1,21 @@
-# Required
+# Required arguments, this example config runs the test example
 
-genome: "resources/amphiura_scaf1_subset.fa"
+## Input data: rna samples (fastqs, listed in a 'tsv' file) and the fasta of the genome
+rna_samples: "config/samples.tsv"
+genome: "resources/afil_subset_scaf20.fa"
 
-rna_samples: "/home/elise/projects/annot/AnnotateSnakeMake/config/samples.tsv"
+## Configuration files for some of the pipeline's tools (see provided examples)
+mikado: "config/mikado.conf" 
+augustus_config: "config/augustus_extrinsic.E.W.P.cfg"
 
-diamond: "/home/elise/projects/annot/AnnotateSnakeMake/resources/swissprot.metazoa.dmnd"
+## Protein databases for gene annontation and gene naming
+diamond: "resources/swissprot.metazoa.dmnd"
+prot_fasta: "resources/metaeuk/prot.fa"
 
-prot_fasta: "/home/elise/projects/annot/AnnotateSnakeMake/resources/metaeuk/prot.fa"
+## Pfam database for dmain annotation
+pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
 
+#-------------------------------------------------------------------------------------------------#
 
-mikado: "/home/elise/projects/annot/AnnotateSnakeMake/config/mikado.conf" #TO DO, create in snakemake
-
-# Optional
+# Optional, additional arguments for transdecoder (suggest removing, only for speed of test run)
 transdecoder_predict_args: "--no_refine_starts"

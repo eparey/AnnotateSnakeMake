@@ -1,7 +1,7 @@
 
 include: "rules/common.smk"
 include: "rules/repeats.smk"
-
+print(config['genome'])
 if not config.get('repeats_only', ''):
     if not config.get('metaeuk_only', ''):
         config['metaeuk_only'] = ''

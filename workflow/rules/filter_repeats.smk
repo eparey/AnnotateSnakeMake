@@ -25,7 +25,7 @@ else:
 
 #hmmpress -f {input.hmm} #hmm = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm"
 rule pfam_scan:
-    input: f = "results/augustus/pep.fa", db = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm.h3i"
+    input: f = "results/augustus/pep.fa", db = config['pfam_db']
     output: out = "results/pfam/unfiltered.genes.pfam-domains.txt"
     conda: "../envs/pfam.yaml"
     params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
@@ -97,15 +97,14 @@ rule cds_to_fasta_filtered:
 
 
 rule busco_filt:
-    input:
-        "results/filter_models/pep.filt{i}.fa",
-         "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json" #dummy to ensure db is downloaded
+    input: p = "results/filter_models/pep.filt{i}.fa",
+           db = "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json" #dummy to ensure db is downloaded
     output:
         out = "results/busco/busco_filter{i}/short_summary.specific.metazoa_odb10.busco_filter{i}.json"
     params: jname = lambda w: "busco_filter" + w.i, odir = "results/busco/"
     threads: 4
     conda: "../envs/busco.yaml"
-    shell: "busco -l metazoa_odb10 --mode proteins --tar -o {params.jname} -f -i {input[0]} --cpu {threads} --out_path {params.odir}"
+    shell: "busco -l metazoa_odb10 --mode proteins --tar -o {params.jname} -f -i {input.p} --cpu {threads} --out_path {params.odir}"
 
 
 rule plot_busco:
