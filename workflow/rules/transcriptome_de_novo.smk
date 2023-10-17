@@ -4,18 +4,20 @@ rule trinity:
            samples = config["rna_samples"]
     output: "results/trinity/Trinity.fasta"
     threads: 24
-    params: odir = lambda w, output: os.path.dirname(output[0])
+    params: odir = lambda w, output: os.path.dirname(output[0]) + '/'
     conda: "../envs/trinity.yaml"
+    log: "logs/trinity/trinity.log"
     shell: "Trinity --trimmomatic --seqType fq --samples_file {input.samples} --CPU {threads} "
-           "--max_memory 300G --output {params.odir} --full_cleanup"
-
+           "--max_memory 300G --output {params.odir} --full_cleanup 2>&1 | tee {log} && "
+           "mv results/trinity.Trinity.fasta {output} && mv results/trinity.Trinity.fasta.gene_trans_map {params.odir}"
 
 rule gmap_db:
     input: config["genome"] + ".masked"
     output: directory("results/gmapdb")
     params: g = GENOME
     conda: "../envs/gmap.yaml"
-    shell: "gmap_build -D {output} -d {params.g} {input}"
+    log: "logs/trinity/gmap_db.log"
+    shell: "gmap_build -D {output} -d {params.g} {input} 2>&1 | tee {log}"
 
 
 rule gmap:
@@ -23,15 +25,10 @@ rule gmap:
     output: 'results/trinity/Trinity_transcripts.gff3'
     params: g = GENOME
     threads: 20
+    log: "logs/trinity/gmap.log"
     shell: "gmap -d {params.g} -D {input.db} -f 3 -n 0 -x 50 -t {threads} -B 5 --gff3-add-separators=0 "
            "--intronlength=500000 {input.fa} > {output}"
 
 
-#minimap2 -t 16 -x splice:hq -uf -c $GNM $TRS > PriCau_trin.paf
-#paftools.js  splice2bed PriCau_trin.paf >  PriCau_trin.bed
-
-
-# Trinity --CPU 24 --max_memory 500G \
-#     --seqType fq --full_cleanup \
-#     --trimmomatic \
-#     --left $LRD --right $RRD --output $SFX\_trinity
+#minimap2 -t 16 -x splice:hq -uf -c $GNM $TRS > trin.paf
+#paftools.js  splice2bed trin.paf >  trin.bed
