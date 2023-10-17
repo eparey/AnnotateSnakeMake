@@ -4,4 +4,4 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - trinity
+  - trinity=2.9.1=h8b12597_1

@@ -4,6 +4,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - perl=5.26.2=h36c2ea0_1008
+  - libxcb=1.13=h7f98852_1004
+  - libzlib=1.2.12=h166bdaf_2
+  - ltr_retriever=2.9.0=hdfd78af_1
   - recon=1.08=hec16e2b_4
   - repeatmasker=4.1.2.p1=pl5262hdfd78af_0
   - repeatmodeler=2.0.2a=pl5262h9ee0642_0
