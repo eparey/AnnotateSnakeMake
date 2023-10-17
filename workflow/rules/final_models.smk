@@ -26,14 +26,16 @@ rule get_cds:
 		genome = config["genome"] + ".masked"
 	output: f"results/final_annotation/{GENOME}-cds_all.fa"
 	conda: "../envs/pasa.yaml"
-	shell: "gffread -x {output} -g {input.genome} {input.gtf}"
+	log: "logs/final_annotation/get_cds.log"
+	shell: "gffread -x {output} -g {input.genome} {input.gtf} 2>&1 | tee {log}"
 
 
 rule get_pep:
 	input: f"results/final_annotation/{GENOME}-cds_all.fa"
 	output: f"results/final_annotation/{GENOME}-pep_all.fa"
 	conda: "../envs/emboss.yaml"
-	shell: "transeq {input} {output} && sed -i 's/_1$//g' {output}"
+	log: "logs/final_annotation/get_pep.log"
+	shell: "transeq {input} {output} && sed -i 's/_1$//g' {output} 2>&1 | tee {log}"
 
 
 rule get_cds_longest_transcript:
@@ -46,7 +48,8 @@ rule get_pep_longest_transcript:
 	input: f"results/final_annotation/{GENOME}-cds_longest-isoform.fa"
 	output: f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"
 	conda: "../envs/emboss.yaml"
-	shell: "transeq {input} {output} && sed -i 's/_1$//g' {output}"
+	log: "logs/final_annotation/get_lgest_pep.log"
+	shell: "transeq {input} {output} && sed -i 's/_1$//g' {output} 2>&1 | tee {log}"
 
 
 rule blast_swissprot:
@@ -54,7 +57,8 @@ rule blast_swissprot:
 	output: f"results/final_annotation/swissprot_blast_result.blp"
 	conda: "../envs/mikado.yaml"
 	threads: 5
-	shell: "diamond blastp --query {input.sp} --db {input.db} --max-hsps 1 --evalue 1e-5 --outfmt 6 --out {output} -p {threads}"
+	log: "logs/final_annotation/diamond.log"
+	shell: "diamond blastp --query {input.sp} --db {input.db} --max-hsps 1 --evalue 1e-5 --outfmt 6 --out {output} -p {threads} 2>&1 | tee {log}"
 
 
 rule add_genenames:
@@ -64,28 +68,31 @@ rule add_genenames:
 
 
 rule busco_final:
-    input: f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"
-    output: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json"
-    params: jname = "busco", odir = "results/final_annotation/"
-    threads: 4
-    conda: "../envs/busco.yaml"
-    shell: "busco -l metazoa_odb10 --tar --mode proteins -o {params.jname} -f -i {input} --cpu {threads} --out_path {params.odir}"
+	input: f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"
+	output: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json"
+	params: jname = "busco", odir = "results/final_annotation/"
+	threads: 4
+	conda: "../envs/busco.yaml"
+	log: "logs/final_annotation/busco.log"
+	shell: "busco -l metazoa_odb10 --tar --mode proteins -o {params.jname} -f -i {input} --cpu {threads} --out_path {params.odir} 2>&1 | tee {log}"
 
 
 rule pfam_final:
-    input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = config['pfam_db']
-    output: "results/final_annotation/pfam/pfam-domains.txt"
-    conda: "../envs/pfam.yaml"
-    params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
-    threads: 8
-    shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output} -cpu {threads}"
+	input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = config['pfam_db']
+	output: "results/final_annotation/pfam/pfam-domains.txt"
+	conda: "../envs/pfam.yaml"
+	params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
+	threads: 8
+	log: "logs/final_annotation/pfam.log"
+	shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output} -cpu {threads} 2>&1 | tee {log}"
 
 
 rule make_bed:
 	input: f"results/final_annotation/{GENOME}.with.names.gtf"
 	output: temp(f"results/final_annotation/{GENOME}.with.names.tmp.bed")
 	conda: "../envs/bedops.yaml"
-	shell: "gtf2bed < {input} > {output}"
+	log: "logs/final_annotation/make_bed.log"
+	shell: "gtf2bed < {input} > {output} 2>&1 | tee {log}"
 
 
 rule list_longest_transcripts:

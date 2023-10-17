@@ -1,6 +1,8 @@
 from pathlib import Path
 
-GENOME = Path(config["genome"]).stem
+
+GENOME_PATH = config["genome"]
+GENOME = Path(GENOME_PATH).stem
 
 def get_genome_size(input_file):
     with open(input_file, 'r') as infile:

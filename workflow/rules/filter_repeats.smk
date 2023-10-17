@@ -6,7 +6,7 @@ if config['metaeuk_only']:
 
     rule metaeuk_cds_to_fasta:
         input: gff = "results/metaeuk.ok.gff",
-               genome = config["genome"] + ".masked"
+               genome = f"{GENOME_PATH}.masked"
         output: out = "results/augustus/pep.fa", tmp = "results/augustus/pep.tmp.fa" #dummy awk to uniquely identify seq
         conda: "../envs/pasa.yaml"
         shell: """
@@ -15,7 +15,7 @@ if config['metaeuk_only']:
 else:
     rule cds_to_fasta:
         input: gff = f"results/augustus/{GENOME}.aug.gff3",
-               genome = config["genome"] + ".masked"
+               genome = f"{GENOME_PATH}.masked"
         output: "results/augustus/pep.fa"
         conda: "../envs/pasa.yaml"
         shell: """
@@ -23,7 +23,6 @@ else:
         """
 
 
-#hmmpress -f {input.hmm} #hmm = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm"
 rule pfam_scan:
     input: f = "results/augustus/pep.fa", db = config['pfam_db']
     output: out = "results/pfam/unfiltered.genes.pfam-domains.txt"
@@ -70,31 +69,12 @@ rule plot_nbgenes:
 
 
 rule cds_to_fasta_filtered:
-    input: gff = "results/filter_models/gene_models.filt.{i}.gff3", genome = config["genome"] + ".masked"
+    input: gff = "results/filter_models/gene_models.filt.{i}.gff3", genome = f"{GENOME_PATH}.masked"
     output: out = "results/filter_models/pep.filt{i}.fa", tmp = "results/filter_models/pep.filt{i}.tmp.fa"
     conda: "../envs/pasa.yaml"
     shell: """
         gffread -y {output.tmp} -g {input.genome} {input.gff} && awk '{{if($0~"^>") {{print $0NR}} else{{print $0}}}}' {output.tmp} | sed s#/#-#g > {output.out}
     """
-
-
-# rule pfam_scan_filt:
-#     input: f = "results/filter_models/pep.filt{i}.fa" , d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/Pfam-A.hmm.h3i"
-#     output: "results/filter_models/pfam/filt{i}.genes.pfam-domains.txt"
-#     params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
-#     conda: "../envs/pfam.yaml"
-#     shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output} -cpu {threads}"
-
-
-# rule plot_pfam:
-#     input: nof = "results/pfam/unfiltered.genes.pfam-domains.txt",
-#            f = expand("results/filter_models/pfam/filt{i}.genes.pfam-domains.txt",
-#                       i=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-#     output: "results/filter_models/pfam.svg"
-#     conda: "../envs/plots.yaml"
-#     params: ','.join(["no_filter"] + [f"filter_{i}" for i in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]])
-#     script: "../scripts/pfam_plots.py"
-
 
 rule busco_filt:
     input: p = "results/filter_models/pep.filt{i}.fa",
