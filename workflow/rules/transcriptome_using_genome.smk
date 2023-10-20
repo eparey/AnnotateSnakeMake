@@ -1,6 +1,6 @@
 
 sample_file = config.get("rna_samples", "")
-print(sample_file)
+# print(sample_file)
 SAMPLES = {}
 if sample_file:
     with open(sample_file, 'r') as infile:
@@ -9,7 +9,7 @@ if sample_file:
                 sample, rep, fastq1, fastq2 = line.strip().split('\t')
                 SAMPLES[sample] = [fastq1, fastq2]
 
-print(SAMPLES)
+# print(SAMPLES)
 
 rule star_index:
     """
