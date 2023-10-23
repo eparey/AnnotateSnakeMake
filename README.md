@@ -1,12 +1,12 @@
-# AnnotateSnakemake
+# AnnotateSnakeMake
 
-**AnnotateSnakemake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of invertebrate species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq* or *fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
+**AnnotateSnakeMake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of invertebrate species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq* or *fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
 
 
 ## Table of content
   - [Installation](#installation)
     - [Conda and Snakemake](#conda-and-snakemake)
-    - [AnnotateSnakemake](#annotatesnakemake)
+    - [AnnotateSnakeMake](#annotatesnakemake)
   - [Usage](#usage)
   	- [Workflow breakdown](#workflow-breakdown)
     - [Test set](#test-set)
@@ -21,7 +21,7 @@
 The pipeline uses Conda to deploy all of its dependencies. The recommended way to install Snakemake is thus to follow the Conda/Mamba installation guidelines detailed in the [Snakemake documentaion](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
 
 
-### AnnotateSnakemake
+### AnnotateSnakeMake
 
 Clone the repository:
 
@@ -48,10 +48,11 @@ The following steps are ~ sequentially ran (see workflow image in `images/workfl
 
 The test sets serves as a an example for input data specification and formatting (see `config/config.yaml` and `resources/`).
 
-- The pipeline has to be run from the `AnnotateSnakemake` folder with the snakemake environnment activated:
+- The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environnment activated:
 
 	```
-	cd AnnotateSnakemake
+	cd AnnotateSnakeMake
+	mamba create -n snakemake -c bioconda -c conda-forge snakemake
 	conda activate snakemake
 	```
 
@@ -78,7 +79,7 @@ The test sets serves as a an example for input data specification and formatting
 
 - Create a configuration file. We recommend copying and editing the example config (`cp config/config.yaml ../Afil_annotation/config_afil.yaml` ). Note that relative paths should be replaced by absolute paths and paths to the user-provided data.
 
-- Run the pipeline, still from within the `AnnotateSnakemake` folder but providing the run directory with `--directory`:
+- Run the pipeline, still from within the `pairtools_out/` folder but providing the run directory with `--directory`:
 
 	```
 	snakemake --configfile ../Afil_annotation/config_afil.yaml --directory ../Afil_annotation/ --use-conda --cores 48

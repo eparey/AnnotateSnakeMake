@@ -1,8 +1,9 @@
 # Required arguments, this example config runs the test example
 
-## Input data: rna samples (fastqs, listed in the 'tsv' file) and the fasta of the genome
-rna_samples: "resources/rna_samples.tsv"
+## Input data: the fasta of the genome and rna samples (fastqs, listed in the 'tsv' file)
 genome: "resources/afi_test_genome.fa"
+rna_samples: "config/rna_samples.tsv"
+
 
 ## Protein databases for gene annontation and gene naming 
 ## (provided test examples are in the resources folder)
@@ -12,7 +13,7 @@ genome: "resources/afi_test_genome.fa"
 prot_fasta: "resources/seq.for.metaeuk.small.fa" 
 
 #diamond db, used to select best transcripts for augustus training and assign gene names at the end
-diamond: "resources/swissprot.metazoa.small.dmnd" 
+diamond: "resources/swissprot.metazoa.small.fa" 
 
 ## Pfam database for domain annotation
 pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
@@ -23,8 +24,6 @@ pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
 mikado: "config/mikado.conf" 
 augustus_config: "config/augustus_extrinsic.E.W.P.cfg"
 pasa_conf: "config/pasa_config.txt"
-
-
 
 
 #-------------------------------------------------------------------------------------------------#

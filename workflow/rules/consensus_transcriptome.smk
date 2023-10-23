@@ -3,7 +3,7 @@
 rule mikado_configure:
     input:
         junctions = "results/portcullis/3-filt/portcullis_filtered.pass.junctions.bed",
-        fa = config["diamond"].replace(".dmnd", ".fa"),
+        fa = config["diamond"],
         g = config["genome"]+'.masked',
         assemblies = config["mikado"],
         trinity = 'results/trinity/Trinity_transcripts.gff3',
@@ -30,9 +30,15 @@ rule mikado_prepare:
     conda: "../envs/mikado.yaml"
     shell: "mikado prepare --json-conf {input} --out {output[1]} --out_fasta {output[0]}"
 
+rule diamond_db:
+    input:  config["diamond"]
+    output:  config["diamond"].replace(".fa", ".dmnd")
+    threads: 30
+    conda: "../envs/mikado.yaml"
+    shell: "diamond makedb --in {input} -d {output}"
 
 rule mikado_diamond:
-    input: q = "results/mikado/mikado_prepared.fasta", db = config["diamond"]
+    input: q = "results/mikado/mikado_prepared.fasta", db = config["diamond"].replace(".fa", ".dmnd")
     output: "results/mikado/mikado_diamond.xml"
     threads: 30
     conda: "../envs/mikado.yaml"
@@ -60,7 +66,7 @@ rule transdecoder_predict:
 
 rule mikado_serialize:
     input: conf = "results/mikado/configuration.ok.yaml", blast = "results/mikado/mikado_diamond.xml",
-           fa = config["diamond"].replace(".dmnd", ".fa"), bed =  "results/mikado/mikado_prepared.fasta.transdecoder.bed" #"results/mikado/mikado_transdecoder.bed"
+           fa = config["diamond"], bed =  "results/mikado/mikado_prepared.fasta.transdecoder.bed" #"results/mikado/mikado_transdecoder.bed"
     output: "results/mikado/mikado.db"
     params: odir = lambda w, output: os.path.dirname(output[0])
     conda: "../envs/mikado.yaml"
