@@ -20,6 +20,11 @@
 
 The pipeline uses Conda to deploy all of its dependencies. The recommended way to install Snakemake is thus to follow the Conda/Mamba installation guidelines detailed in the [Snakemake documentaion](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
 
+We recommend creating a conda environment with snakemake 7.12 and tabulate 0.8:
+
+```
+mamba create -n snakemake -c bioconda -c conda-forge snakemake=7.12 tabulate=0.8
+```
 
 ### AnnotateSnakeMake
 
@@ -48,11 +53,10 @@ The following steps are ~ sequentially ran (see workflow image in `images/workfl
 
 The test sets serves as a an example for input data specification and formatting (see `config/config.yaml` and `resources/`).
 
-- The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environnment activated:
+- The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environnment activated (see above to create the 'snakemake' conda env):
 
 	```
 	cd AnnotateSnakeMake
-	mamba create -n snakemake -c bioconda -c conda-forge snakemake
 	conda activate snakemake
 	```
 
