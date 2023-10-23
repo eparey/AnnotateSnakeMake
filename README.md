@@ -85,13 +85,14 @@ The test sets serves as a an example for input data specification and formatting
 	```
 
 
-## Contact
+## Contributors
 
 The workflow was primarily deposited for reproducibility purposes, but if you are interested in running it but are encountering issues, please do not hesitate to contact us, we are happy to help:
 
 - [Elise Parey](e.parey@ucl.ac.uk)
 - [Ferdinand Marlétaz](f.marletaz@ucl.ac.uk)
 
+We also thank Chema Martin-Duran for contributing to the establishment of the annotation pipeline.
 
 ## References
 
