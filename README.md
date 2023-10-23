@@ -51,9 +51,9 @@ The following steps are ~ sequentially ran (see workflow image in `images/workfl
 
 ### Test set
 
-The test sets serves as a an example for input data specification and formatting (see `config/config.yaml` and `resources/`).
+The test sets serves as an example for input data specification and formatting (see `config/config.yaml` and `resources/`).
 
-- The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environnment activated (see above to create the 'snakemake' conda env):
+- The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environment activated (see above to create the 'snakemake' conda env):
 
 	```
 	cd AnnotateSnakeMake
@@ -83,7 +83,7 @@ The test sets serves as a an example for input data specification and formatting
 
 - Create a configuration file. We recommend copying and editing the example config (`cp config/config.yaml ../Afil_annotation/config_afil.yaml` ). Note that relative paths should be replaced by absolute paths and paths to the user-provided data.
 
-- Run the pipeline, still from within the `pairtools_out/` folder but providing the run directory with `--directory`:
+- Run the pipeline, still from within the `AnnotateSnakeMake/` folder but providing the run directory with `--directory`:
 
 	```
 	conda activate snakemake
