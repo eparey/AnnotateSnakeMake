@@ -87,31 +87,47 @@ rule cat_hints:
   output: "results/hints_for_augustus/hints.gff"
   shell: "cat {input} > {output}"
 
-
-rule split_fasta:
-    input: genome = f"{GENOME_PATH}.masked"
-    output: temp(expand('.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked",\
-                        i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)]))
-    conda: "../envs/pyfasta.yaml"
-    shell: "pyfasta split {input} -n 20"
-
-
-if not config['metaeuk_only']:
-    rule augustus:
-        input: hints = "results/hints_for_augustus/hints.gff",
-               c = config.get("augustus_config"),
-               train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
-               genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
-        output: f"results/augustus/{GENOME}.{{i}}.aug.out"
-        params: sp = GENOME
-        conda: '../envs/augustus.yaml'
-        # log: "logs/augustus/augustus_pred_{i}.log"
-        shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
-               "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
-               "--alternatives-from-evidence=false {input.genome} > {output}"
+if not config.get('donotsplit', False):
+    rule split_fasta:
+        input: genome = f"{GENOME_PATH}.masked"
+        output: temp(expand('.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked",\
+                            i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)]))
+        conda: "../envs/pyfasta.yaml"
+        shell: "pyfasta split {input} -n 20"
 
 
-    rule cat_augustus:
-        input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
-        output: f"results/augustus/{GENOME}.aug.gff3"
-        shell: "cat {input} | grep -v '^#' > {output}"
+    if not config['metaeuk_only']:
+        rule augustus:
+            input: hints = "results/hints_for_augustus/hints.gff",
+                   c = config.get("augustus_config"),
+                   train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
+                   genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
+            output: f"results/augustus/{GENOME}.{{i}}.aug.out"
+            params: sp = GENOME
+            conda: '../envs/augustus.yaml'
+            # log: "logs/augustus/augustus_pred_{i}.log"
+            shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
+                   "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
+                   "--alternatives-from-evidence=false {input.genome} > {output}"
+
+
+        rule cat_augustus:
+            input: expand(f"results/augustus/{GENOME}.{{i}}.aug.out", i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)])
+            output: f"results/augustus/{GENOME}.aug.gff3"
+            shell: "cat {input} | grep -v '^#' > {output}"
+
+
+else:
+    if not config['metaeuk_only']:
+        rule augustus:
+            input: hints = "results/hints_for_augustus/hints.gff",
+                   c = config.get("augustus_config"),
+                   train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
+                   genome = f"{GENOME_PATH}.masked"
+            output: f"results/augustus/{GENOME}.aug.gff3"
+            params: sp = GENOME
+            conda: '../envs/augustus.yaml'
+            # log: "logs/augustus/augustus_pred_{i}.log"
+            shell: "augustus --uniqueGeneId=true --gff3=on --species={params.sp} --hintsfile={input.hints} "
+                   "--extrinsicCfgFile={input.c} --allow_hinted_splicesites=atac "
+                   "--alternatives-from-evidence=false {input.genome} > {output}"
