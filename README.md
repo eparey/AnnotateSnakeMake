@@ -26,7 +26,7 @@ The pipeline uses Conda to deploy all of its dependencies. The recommended way t
 Clone the repository:
 
   ```
-  git clone https://github.com/eparey/AnnotateSnakemake.git
+  git clone https://github.com/eparey/AnnotateSnakeMake.git
   ```
 
 ## Usage
