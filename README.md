@@ -92,7 +92,7 @@ The workflow was primarily deposited for reproducibility purposes, but if you ar
 - [Elise Parey](e.parey@ucl.ac.uk)
 - [Ferdinand Marlétaz](f.marletaz@ucl.ac.uk)
 
-We also thank Chema Martin-Duran for contributing to the establishment of the annotation pipeline.
+We also thank Chema Martin-Duran for contributing to the development of the pipeline.
 
 ## References
 
