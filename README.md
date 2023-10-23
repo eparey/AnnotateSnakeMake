@@ -86,6 +86,7 @@ The test sets serves as a an example for input data specification and formatting
 - Run the pipeline, still from within the `pairtools_out/` folder but providing the run directory with `--directory`:
 
 	```
+	conda activate snakemake
 	snakemake --configfile ../Afil_annotation/config_afil.yaml --directory ../Afil_annotation/ --use-conda --cores 48
 	```
 
