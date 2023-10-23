@@ -1,21 +1,50 @@
 # Required arguments, this example config runs the test example
 
-## Input data: rna samples (fastqs, listed in a 'tsv' file) and the fasta of the genome
-rna_samples: "config/samples.tsv"
-genome: "resources/afil_subset_scaf20.fa"
+## Input data: rna samples (fastqs, listed in the 'tsv' file) and the fasta of the genome
+rna_samples: "resources/rna_samples.tsv"
+genome: "resources/afi_test_genome.fa"
 
-## Configuration files for some of the pipeline's tools (see provided examples)
+## Protein databases for gene annontation and gene naming 
+## (provided test examples are in the resources folder)
+
+#proteins to use for homology-based predictions (will be used as hints for AUGUSTUS)
+#recommend using high-quality annotations from ~ related species
+prot_fasta: "resources/seq.for.metaeuk.small.fa" 
+
+#diamond db, used to select best transcripts for augustus training and assign gene names at the end
+diamond: "resources/swissprot.metazoa.small.dmnd" 
+
+## Pfam database for domain annotation
+pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
+
+
+## Configuration files for some of the pipeline's tools
+## provided examples in the config folder
 mikado: "config/mikado.conf" 
 augustus_config: "config/augustus_extrinsic.E.W.P.cfg"
+pasa_conf: "config/pasa_config.txt"
 
-## Protein databases for gene annontation and gene naming
-diamond: "resources/swissprot.metazoa.dmnd"
-prot_fasta: "resources/metaeuk/prot.fa"
 
-## Pfam database for dmain annotation
-pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
+
 
 #-------------------------------------------------------------------------------------------------#
 
-# Optional, additional arguments for transdecoder (suggest removing, only for speed of test run)
+# Optional
+
+## Three-letter code to use as prefix to gene ids
+species_3letters_code: "AFL"
+
+################ IMPORTANT ####################
+# FOR TEST RUN ONLY, TO REMOVE ON REAL RUN !! #
+
+#simplified transdecoder run
 transdecoder_predict_args: "--no_refine_starts"
+
+#do not parallelize over scaffold/chr
+donotsplit: True 
+
+###############################################
+
+## Notes:
+# You may find that you need to increase ulimit (open files) for STAR to run properly
+# (for instance setting ulimit -n 16384)

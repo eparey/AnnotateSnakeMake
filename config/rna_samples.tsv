@@ -1,0 +1,3 @@
+#id	description	fastq1	fastq2
+Af5	stage5	resources/Af5_ds_1.fq.gz	resources/Af5_ds_2.fq.gz
+Af8	nr	resources/Af8_ds_1.fq.gz	resources/Af8_ds_2.fq.gz
