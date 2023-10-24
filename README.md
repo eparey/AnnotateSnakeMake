@@ -1,6 +1,6 @@
 # AnnotateSnakeMake
 
-**AnnotateSnakeMake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of invertebrate species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq* or *fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
+**AnnotateSnakeMake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of echinoderm species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq* or *fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
 
 
 ## Table of content
@@ -18,7 +18,7 @@
 
 ### Conda and Snakemake
 
-The pipeline uses Conda to deploy all of its dependencies. The recommended way to install Snakemake is thus to follow the Conda/Mamba installation guidelines detailed in the [Snakemake documentaion](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+The pipeline uses Conda to deploy all of its dependencies automatically. The recommended way to install Snakemake is thus to follow the Conda/Mamba installation guidelines detailed in the [Snakemake documentaion](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
 
 We recommend creating a conda environment with snakemake 7.12 and tabulate 0.8:
 
