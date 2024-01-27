@@ -11,6 +11,8 @@ output = snakemake.output[0]
 buscos = {l:f for l, f in zip(labels, infiles)}
 
 cols = ["Complete", "Multi copy", "Single copy", "Missing", "Fragmented"]
+cols += ["Complete percentage", "Multi copy percentage", "Single copy percentage", "Missing percentage", "Fragmented percentage"]
+
 d_res = {}
 for busco in buscos:
     infile = buscos[busco]
@@ -21,7 +23,6 @@ for busco in buscos:
 
 df = pd.DataFrame.from_dict(d_res, orient='index')
 df['gene_set'] = df.index
-
 dfm = df.melt('gene_set', var_name='busco metazoa', value_name='busco %')
 plot = sns.catplot(x="gene_set", y="busco %", hue='busco metazoa', data=dfm, kind='point')
 
