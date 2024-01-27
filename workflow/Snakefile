@@ -1,6 +1,7 @@
 
 include: "rules/common.smk"
 include: "rules/repeats.smk"
+
 # print(config['genome'])
 if not config.get('repeats_only', ''):
     if not config.get('metaeuk_only', ''):
@@ -18,5 +19,6 @@ if not config.get('repeats_only', ''):
     rule all:
         input: "results/final_annotation/pfam/pfam-domains.txt", "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json", "results/filter_models/busco.svg", f"results/final_annotation/{GENOME}.with.names.bed", f"results/repeats/{GENOME}_repeat_landscape.html"
 
-# # else:
-#     rule all: f'results/repeats/{GENOME}_repeat_landscape.html'
+else:
+    rule all:
+        input: f'results/repeats/{GENOME}_repeat_landscape.html'

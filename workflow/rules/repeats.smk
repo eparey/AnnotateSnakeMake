@@ -4,7 +4,7 @@ rule make_db:
     Create database for RepeatModeler
     """
     input: config["genome"]
-    output: temp(expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation']))
+    output: touch('.db_rm_ok')
     log: "logs/repeats/make_db.log"
     params: name = lambda w, input: Path(input[0]).stem
     conda: "../envs/repeats.yaml"
@@ -13,12 +13,14 @@ rule make_db:
 rule repeat_mod:
     """
     Run RepeatModeler
+    # input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
+
     """
-    input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
+    input: '.db_rm_ok'
     output: tmp1 = temp(f'{GENOME}-families.fa'), tmp2 = temp(f'{GENOME}-families.stk'),
             final1 = f"results/repeats/{GENOME}-families.fa", final2 = f"results/repeats/{GENOME}-families.stk"
     log: "logs/repeats/repeat_modeler.log"
-    params: name = lambda w, input: Path(input[0]).stem
+    params: name = GENOME
     conda: "../envs/repeats.yaml"
     threads: min(workflow.cores/4, 12) #RM uses four times the specified number of cores
     shell: "RepeatModeler -engine ncbi -pa {threads} -database {params.name} 2>&1 | tee {log} && rm -rf RM_* && "
@@ -32,7 +34,7 @@ rule repeat_masker:
     output: config["genome"]+'.masked', config["genome"]+'.align', config["genome"]+'.out', config["genome"]+'.tbl'
     log: "logs/repeats/repeat_masker.log"
     conda: "../envs/repeats.yaml"
-    threads: min(workflow.cores/4, 12) #RM uses four times the specified number of cores
+    threads: min(workflow.cores/4, 16) #RM uses four times the specified number of cores
     shell: "RepeatMasker -pa {threads} -xsmall -gff -lib {input.lib} {input.g} -a 2>&1 | tee {log}"
 
 
