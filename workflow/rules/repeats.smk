@@ -10,21 +10,21 @@ rule make_db:
     conda: "../envs/repeats.yaml"
     shell: "BuildDatabase -name {params.name} -engine ncbi {input} 2>&1 | tee {log}"
 
-# rule repeat_mod:
-#     """
-#     Run RepeatModeler
-#     # input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
+rule repeat_mod:
+    """
+    Run RepeatModeler
+    # input: expand(f'{GENOME}.{{ext}}', ext=['nsq', 'nhr', 'nin', 'nnd', 'nni', 'nog', 'translation'])
 
-#     """
-#     input: '.db_rm_ok'
-#     output: tmp1 = temp(f'{GENOME}-families.fa'), tmp2 = temp(f'{GENOME}-families.stk'),
-#             final1 = f"results/repeats/{GENOME}-families.fa", final2 = f"results/repeats/{GENOME}-families.stk"
-#     log: "logs/repeats/repeat_modeler.log"
-#     params: name = GENOME
-#     conda: "../envs/repeats.yaml"
-#     threads: min(workflow.cores/4, 12) #RM uses four times the specified number of cores
-#     shell: "RepeatModeler -engine ncbi -pa {threads} -database {params.name} 2>&1 | tee {log} && rm -rf RM_* && "
-#            "cp {output.tmp1} {output.final1} && cp {output.tmp2} {output.final2}"
+    """
+    input: '.db_rm_ok'
+    output: tmp1 = temp(f'{GENOME}-families.fa'), tmp2 = temp(f'{GENOME}-families.stk'),
+            final1 = f"results/repeats/{GENOME}-families.fa", final2 = f"results/repeats/{GENOME}-families.stk"
+    log: "logs/repeats/repeat_modeler.log"
+    params: name = GENOME
+    conda: "../envs/repeats.yaml"
+    threads: min(workflow.cores/4, 12) #RM uses four times the specified number of cores
+    shell: "RepeatModeler -engine ncbi -pa {threads} -database {params.name} 2>&1 | tee {log} && rm -rf RM_* && "
+           "cp {output.tmp1} {output.final1} && cp {output.tmp2} {output.final2}"
 
 rule repeat_masker:
     """
