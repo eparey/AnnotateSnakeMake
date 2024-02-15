@@ -90,7 +90,7 @@ rule cat_hints:
 if not config.get('donotsplit', False):
     rule split_fasta:
         input: genome = f"{GENOME_PATH}.masked"
-        output: temp(expand('.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked",\
+        output: temp(expand('.fa'.join(config["genome"].split('.fa')[:-1]) + ".{i}.fa" + config["genome"].split('.fa')[-1] + ".masked",\
                             i=['0'+str(i) for i in range(0, 10)] + [str(i) for i in range(10, 20)]))
         conda: "../envs/pyfasta.yaml"
         shell: "pyfasta split {input} -n 20"
@@ -101,7 +101,7 @@ if not config.get('donotsplit', False):
             input: hints = "results/hints_for_augustus/hints.gff",
                    c = config.get("augustus_config"),
                    train = "results/augustus_training/autoAugTrain/training/test/augustus.2.CRF.out",
-                   genome = '.'.join(config["genome"].split('.')[:-1]) + ".{i}." + config["genome"].split('.')[-1] + ".masked"
+                   genome = '.fa'.join(config["genome"].split('.fa')[:-1]) + ".{i}.fa" + config["genome"].split('.fa')[-1] + ".masked"
             output: f"results/augustus/{GENOME}.{{i}}.aug.out"
             params: sp = GENOME
             conda: '../envs/augustus.yaml'
