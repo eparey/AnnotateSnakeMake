@@ -68,13 +68,15 @@ rule add_genenames:
 
 
 rule busco_final:
-	input: f"results/final_annotation/{GENOME}-pep_longest-isoform.fa"
+	input:
+		pep = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa",
+		dummy_db_downloaded = "results/busco/busco_unfilterred/short_summary.specific.metazoa_odb10.busco_unfilterred.json"
 	output: "results/final_annotation/busco/short_summary.specific.metazoa_odb10.busco.json"
 	params: jname = "busco", odir = "results/final_annotation/"
 	threads: 4
 	conda: "../envs/busco.yaml"
 	# log: "logs/final_annotation/busco.log"
-	shell: "busco -l metazoa_odb10 --tar --mode proteins -o {params.jname} -f -i {input} --cpu {threads} --out_path {params.odir}"
+	shell: "busco -l metazoa_odb10 --tar --mode proteins -o {params.jname} -f -i {input.pep} --cpu {threads} --out_path {params.odir}"
 
 
 rule pfam_final:
