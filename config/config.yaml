@@ -15,8 +15,11 @@ prot_fasta: "resources/seq.for.metaeuk.small.fa"
 #diamond db, used to select best transcripts for augustus training and assign gene names at the end
 diamond: "resources/swissprot.metazoa.small.fa" 
 
-## Pfam database for domain annotation
-pfam_db: "resources/pfam_db/Pfam-A.hmm.h3i"
+
+## Location of Pfam database for domain annotation
+# Instructions to prepare the database can be found here: https://github.com/aziele/pfam_scan
+# (please see 'Prepare library of Pfam HMMs')
+pfam_db: "resources/pfam_db"
 
 
 ## Configuration files for some of the pipeline's tools

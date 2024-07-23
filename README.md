@@ -56,6 +56,8 @@ The following steps are ~ sequentially ran (see workflow image in `images/workfl
 
 The test sets serves as an example for input data specification and formatting (see `config/config.yaml` and `resources/`).
 
+Before running, users need to download and format the pfam database, and specify its location in `config/config.yaml` (please see download instructions at https://github.com/aziele/pfam_scan, 'Prepare library of Pfam HMMs').
+
 - The pipeline has to be run from the `AnnotateSnakeMake` folder with the snakemake environment activated (see above to create the 'snakemake' conda env):
 
 	```
@@ -107,4 +109,4 @@ We also thank Chema Martin-Duran for contributing to the development of the pipe
 
 The annotation workflow is described in the methods section of the brittle star *Amphiura filiformis* genome manuscript:
 
-Parey et al. (2023), The brittle star genome illuminates the genetic basis of animal appendage regeneration, bioRxiv.
+Parey, E. et al. The brittle star genome illuminates the genetic basis of animal appendage regeneration. Nat Ecol Evol (2024). https://doi.org/10.1038/s41559-024-02456-y

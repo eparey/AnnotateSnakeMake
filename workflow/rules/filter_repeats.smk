@@ -24,10 +24,10 @@ else:
 
 
 rule pfam_scan:
-    input: f = "results/augustus/pep.fa", db = config['pfam_db']
+    input: f = "results/augustus/pep.fa", db = config['pfam_db'].rstrip('/') + '/Pfam-A.hmm.h3i'
     output: out = "results/pfam/unfiltered.genes.pfam-domains.txt"
     conda: "../envs/pfam.yaml"
-    params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
+    params: d =  config['pfam_db']
     threads: 8
     shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output.out} -cpu {threads}"
 

@@ -80,10 +80,10 @@ rule busco_final:
 
 
 rule pfam_final:
-	input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = config['pfam_db']
+	input: f = f"results/final_annotation/{GENOME}-pep_longest-isoform.fa", d = config['pfam_db'].rstrip('/') + '/Pfam-A.hmm.h3i'
 	output: "results/final_annotation/pfam/pfam-domains.txt"
 	conda: "../envs/pfam.yaml"
-	params: d = "/home/elise/projects/annot/AnnotateSnakeMake/resources/pfam_db/"
+	params: d = config['pfam_db']
 	threads: 8
 	# log: "logs/final_annotation/pfam.log"
 	shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output} -cpu {threads}"
