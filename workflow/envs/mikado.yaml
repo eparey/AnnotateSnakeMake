@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - biopython<1.76
   - diamond=2.0.14
   - mikado=1.2.4
   - networkx<2
