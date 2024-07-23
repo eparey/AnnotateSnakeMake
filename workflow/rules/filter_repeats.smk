@@ -22,14 +22,15 @@ else:
             gffread -y {output} -g {input.genome} {input.gff}
         """
 
-
-rule pfam_scan:
-    input: f = "results/augustus/pep.fa", db = config['pfam_db'].rstrip('/') + '/Pfam-A.hmm.h3i'
-    output: out = "results/pfam/unfiltered.genes.pfam-domains.txt"
-    conda: "../envs/pfam.yaml"
-    params: d =  config['pfam_db']
-    threads: 8
-    shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output.out} -cpu {threads}"
+#We could also do pfam scan before and after filtering to check that we only lose repeat-like domains
+#But this takes a bit of runtime and busco / number of genes seem to be a good indicators to assess repeat filtering 
+# rule pfam_scan:
+#     input: f = "results/augustus/pep.fa", db = config['pfam_db'].rstrip('/') + '/Pfam-A.hmm.h3i'
+#     output: out = "results/pfam/unfiltered.genes.pfam-domains.txt"
+#     conda: "../envs/pfam.yaml"
+#     params: d =  config['pfam_db']
+#     threads: 8
+#     shell: "pfam_scan.pl -fasta {input.f} -dir {params.d} -outfile {output.out} -cpu {threads}"
 
 rule busco:
     input: "results/augustus/pep.fa"
@@ -42,7 +43,6 @@ rule busco:
 
 
 if config['metaeuk_only']:
-
 
     rule filter_gene_models_meta:
         input: "results/metaeuk.ok.gff", f'results/repeats/{GENOME}_repeats.bed'
