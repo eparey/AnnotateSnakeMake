@@ -108,6 +108,6 @@ We also thank Chema Martin-Duran for contributing to the development of the pipe
 
 ## References
 
-The annotation workflow is described in the methods section of the brittle star *Amphiura filiformis* genome manuscript:
+The annotation workflow is described in the methods section of the brittle star *Amphiura filiformis* genome paper:
 
 Parey, E. et al. The brittle star genome illuminates the genetic basis of animal appendage regeneration. Nat Ecol Evol (2024). https://doi.org/10.1038/s41559-024-02456-y
