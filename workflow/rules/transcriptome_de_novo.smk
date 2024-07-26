@@ -24,6 +24,7 @@ rule gmap:
     input: fa = "results/trinity/Trinity.fasta", db = "results/gmapdb/"
     output: 'results/trinity/Trinity_transcripts.gff3'
     params: g = GENOME
+    conda: "../envs/gmap.yaml"
     threads: 20
     log: "logs/trinity/gmap.log"
     shell: "gmap -d {params.g} -D {input.db} -f 3 -n 0 -x 50 -t {threads} -B 5 --gff3-add-separators=0 "
