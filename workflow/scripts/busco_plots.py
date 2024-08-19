@@ -1,6 +1,9 @@
 import seaborn as sns
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
+
+matplotlib.use('Agg')
 
 import json
 
