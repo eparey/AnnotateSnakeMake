@@ -35,7 +35,7 @@ rule repeat_masker:
     log: "logs/repeats/repeat_masker.log"
     conda: "../envs/repeats.yaml"
     threads: min(workflow.cores/4, 16) #RM uses four times the specified number of cores
-    shell: "RepeatMasker -pa {threads} -xsmall -gff -lib {input.lib} {input.g} -a 2>&1 | tee {log}"
+    shell: "RepeatMasker -pa {threads} -xsmall -gff -lib {input.lib} {input.g} -a 2>&1 | tee {log}" #-no_is
 
 
 rule repeat_masker_to_bed:

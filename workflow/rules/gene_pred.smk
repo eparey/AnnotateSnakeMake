@@ -4,7 +4,7 @@ rule select_mikado_train:
     input: "results/mikado/mikado.loci.metrics.tsv", "results/mikado/mikado.loci.gff3"
     output: "results/augustus_train/training.gff3"
     conda: "../envs/python3.yaml"
-    params: f = 0.5, e = 2
+    params: f = 0.5
     script: "../scripts/select_mik_train.py"
 
 

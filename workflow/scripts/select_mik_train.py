@@ -33,13 +33,37 @@ with open(snakemake.input[0]) as mtr:
         hasStart, hasStop = loc[d["has_start_codon"]], loc[d["has_stop_codon"]]
         nbExon = int(loc[d["exon_num"]])
         # print(blastCov, hasStart, hasStop, nbExon)
-        if blastCov>snakemake.params[0] and hasStart=='True' and hasStop=='True' and nbExon>=snakemake.params[1]:
+        if blastCov>snakemake.params[0] and hasStart=='True' and hasStop=='True' and nbExon>=2:
             if not gid in genes:
                 training.add(tid)
                 genes.add(gid)
 
-print(f"{len(training)} transcripts and {len(genes)} genes selected!")
-print(list(training)[0:5])
+print(f"{len(training)} transcripts and {len(genes)} genes selected! (first pass)")
+
+#Not elegant but make a second pass on the file to get a few single-exon genes
+number_to_add = int(len(training)*0.10)#add a maximum of single-exon genes (max 10% training set size)
+ncount = 0
+with open(snakemake.input[0]) as mtr:
+    for loc in csv.reader(mtr, delimiter='\t'):
+        if loc[0]=='tid':
+            d = {l:i for  i, l in enumerate(loc)}
+            continue
+        tid = loc[d["tid"]]
+        gid = loc[d["parent"]]
+        blastCov = float(loc[d["blast_query_coverage"]])
+        hasStart, hasStop = loc[d["has_start_codon"]], loc[d["has_stop_codon"]]
+        nbExon = int(loc[d["exon_num"]])
+        # print(blastCov, hasStart, hasStop, nbExon)
+        if blastCov>snakemake.params[0] and hasStart=='True' and hasStop=='True' and nbExon==1:
+            if not gid in genes:
+                training.add(tid)
+                genes.add(gid)
+                ncount += 1
+        if ncount == number_to_add:
+            break
+
+print(f"{len(training)} transcripts and {len(genes)} genes selected! (final pass)")
+# print(list(training)[0:5])
 
 added=set()
 with open(snakemake.output[0], 'w') as tgf:
