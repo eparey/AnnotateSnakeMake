@@ -59,7 +59,7 @@ with open(snakemake.input[0]) as mtr:
                 training.add(tid)
                 genes.add(gid)
                 ncount += 1
-        if ncount == number_to_add:
+        if ncount >= number_to_add:
             break
 
 print(f"{len(training)} transcripts and {len(genes)} genes selected! (final pass)")
