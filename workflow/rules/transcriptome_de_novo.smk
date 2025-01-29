@@ -4,6 +4,7 @@ rule trinity:
            samples = config["rna_samples"]
     output: "results/trinity/Trinity.fasta"
     threads: 24
+    priority: 100
     params: odir = lambda w, output: os.path.dirname(output[0]) + '/'
     conda: "../envs/trinity.yaml"
     log: "logs/trinity/trinity.log"

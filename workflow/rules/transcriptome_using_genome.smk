@@ -7,6 +7,7 @@ if sample_file:
         for line in infile:
             if line[0] != '#':
                 sample, rep, fastq1, fastq2 = line.strip().split('\t')
+                assert fastq1.endswith('.gz') and fastq2.endswith('.gz'), "Error: expected gzipped fastqs, STAR command will likely not run properly."
                 SAMPLES[sample] = [fastq1, fastq2]
 
 # print(SAMPLES)

@@ -26,8 +26,6 @@ with open(pasa_gff, "r") as f, open(outfile, 'w') as out:
 
         if feat=='mRNA' or feat=='transcript':
 
-            
-
 
             if not gID or no_gene_feat == True:
                 no_gene_feat = True
