@@ -4,7 +4,7 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.12.0-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
 
 
-**AnnotateSnakeMake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of echinoderm species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq* or *fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
+**AnnotateSnakeMake** is a Snakemake workflow routinely used in the [Marlétaz lab](https://fmarletaz.github.io/) to **annotate genomes** of echinoderm species. It takes as input a **genome sequence** (*fasta*) and **RNA-seq datasets** (*fastq.gz*, paired-end) and outputs the set of annotated **protein-coding genes** (*bed*, *gtf* and *fasta* files).
 
 
 ## Table of content
